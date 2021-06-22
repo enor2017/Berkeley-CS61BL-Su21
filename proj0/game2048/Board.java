@@ -27,7 +27,9 @@ public class Board implements Iterable<Tile> {
     }
 
     /** Create a board where RAWVALUES hold the values of the tiles on the board 
-     * (0 is null) with a current score of SCORE and the viewing perspective set to north. */
+     * (0 is null) with a current score of SCORE and the viewing perspective set to north.
+     * @bug: why pass score into this constructor?
+     */
     public Board(int[][] rawValues, int score) {
         int size = rawValues.length;
         values = new Tile[size][size];

@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author enor2017
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -28,14 +28,18 @@ public class Model extends Observable {
     /** A new 2048 game on a board of size SIZE with no pieces
      *  and score 0. */
     public Model(int size) {
-        // TODO: Fill in this constructor.
+        board = new Board(size);
     }
 
     /** A new 2048 game where RAWVALUES contain the values of the tiles
      * (0 if null). VALUES is indexed by (row, col) with (0, 0) corresponding
      * to the bottom-left corner. Used for testing purposes. */
     public Model(int[][] rawValues, int score, int maxScore, boolean gameOver) {
-        // TODO: Fill in this constructor.
+        // since 'score' inside board's constructor is useless, we pass -1 here
+        board = new Board(rawValues, -1);
+        this.score = score;
+        this.maxScore = maxScore;
+        this.gameOver = gameOver;
     }
 
     /** Return the current Tile at (COL, ROW), where 0 <= ROW < size(),
@@ -99,14 +103,120 @@ public class Model extends Observable {
      * 3. When three adjacent tiles in the direction of motion have the same
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
+     *
+     * @author: enor2017
      * */
+
+    /**
+     *  Below are comments by enor2017.
+     *
+     *  The board looks like:
+     *  (0,3) (1,3) (2,3) (3,3)
+     *  (0,2) (1,2) (2,2) (3,2)
+     *  (0,1) (1,1) (2,1) (3,1)
+     *  (0,0) (1,0) (2,0) (3,0)
+     */
+
+    /**
+     * helper function:
+     * continuously go up from the given row, return the LAST empty tile
+     * if no, return -1
+     */
+    public int top_space(int col, int row){
+        int size = board.size();
+        int i = 0;
+        for(i = row + 1; i < size; ++i){
+            if(board.tile(col, i) != null) break;
+        }
+        i--;
+        if(i == row){
+            // this means no space above the current tile
+            return -1;
+        }else{
+            return i;
+        }
+    }
+
+    /**
+     * helper function to tilt one column
+     * regard side == NORTH
+     *
+     * 1. Deal with tile movement
+     * 2. Deal with tile merge
+     * 3. Update score
+     * 4. Declare change
+     */
+    public boolean tilt_col(int col){
+        boolean changed = false;
+        int size = board.size();
+
+        // record whether cell can be merged.
+        // default value for boolean is <false>.
+        boolean[] forbid_merge = new boolean[4];
+
+        for(int i = size - 2; i >= 0; --i){
+            // current cell: (col, i)
+            // upper cell: (col, i + 1) (MAY not have)
+            Tile current_cell = board.tile(col, i);
+            Tile upper_cell = null;
+            if(i <= size - 2) upper_cell = board.tile(col, i + 1);
+
+            // 1. If current cell is null, do nothing.
+            if(current_cell == null) continue;
+
+            // 2. find if there is any blank space
+            int blank_space = top_space(col, i);
+            if(blank_space != -1){
+                // move current cell to that one
+                board.move(col, blank_space, current_cell);
+                // declare change
+                changed = true;
+                // No score update.
+                // start next loop with CURRENT i. (IMPORTANT)
+                i = blank_space + 1;
+                continue;
+            }
+
+            // 3. Otherwise, find if it can be merged with upper cell
+            // JUMP if current cell is at top, so that no upper_cell available
+            if(i == size - 1) continue;
+            if((current_cell.value() == upper_cell.value()) && (!forbid_merge[i + 1])){
+                int original_value = current_cell.value();
+                // merge!
+                board.move(col, i + 1, current_cell);
+                // declare change
+                changed = true;
+                // update score
+                score += (original_value * 2);
+                // cannot be merged again
+                forbid_merge[i + 1] = true;
+                // start next loop with CURRENT i. (IMPORTANT)
+                i = i + 1;
+
+                continue;
+            }
+
+            // 4. If cannot be moved nor merged, do nothing.
+        }
+        return changed;
+    }
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
 
-        // TODO: Modify this.board (and perhaps this.score) to account
+        // Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+
+        board.setViewingPerspective(side);
+
+        int size = board.size();
+        for(int i = 0; i < size; ++i){
+            boolean col_changed = tilt_col(i);
+            if(col_changed) changed = true;
+        }
+
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
@@ -129,9 +239,16 @@ public class Model extends Observable {
 
     /** Returns true if at least one space on the Board is empty.
      *  Empty spaces are stored as null.
+     *
+     *  @author: enor2017
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        int board_size = b.size();
+        for(int i = 0; i < board_size; ++i){
+            for(int j = 0; j < board_size; ++j){
+                if(b.tile(i, j) == null) return true;
+            }
+        }
         return false;
     }
 
@@ -139,9 +256,17 @@ public class Model extends Observable {
      * Returns true if any tile is equal to the maximum valid value.
      * Maximum valid value is given by MAX_PIECE. Note that
      * given a Tile object t, we get its value with t.value().
+     *
+     * @author: enor2017
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        int board_size = b.size();
+        for(int i = 0; i < board_size; ++i){
+            for(int j = 0; j < board_size; ++j){
+                if(b.tile(i, j) == null) continue;
+                if(b.tile(i, j).value() == MAX_PIECE) return true;
+            }
+        }
         return false;
     }
 
@@ -150,9 +275,29 @@ public class Model extends Observable {
      * There are two ways that there can be valid moves:
      * 1. There is at least one empty space on the board.
      * 2. There are two adjacent tiles with the same value.
+     *
+     * @author: enor2017
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        // condition 1: exists blank space
+        if(emptySpaceExists(b)) return true;
+
+        // condition 2: can be merged
+        /// 1. check up
+        int board_size = b.size();
+        for(int i = 0; i < board_size; ++i){
+            for(int j = 0; j < board_size - 1; ++j){
+                /// no need to check null
+                if(b.tile(i, j).value() == b.tile(i, j + 1).value()) return true;
+            }
+        }
+        /// 2. check right
+        for(int i = 0; i < board_size - 1; ++i){
+            for(int j = 0; j < board_size; ++j){
+                if(b.tile(i, j).value() == b.tile(i + 1, j).value()) return true;
+            }
+        }
+
         return false;
     }
 
