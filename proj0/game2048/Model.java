@@ -29,6 +29,8 @@ public class Model extends Observable {
      *  and score 0. */
     public Model(int size) {
         board = new Board(size);
+        score = maxScore = 0;
+        gameOver = false;
     }
 
     /** A new 2048 game where RAWVALUES contain the values of the tiles
