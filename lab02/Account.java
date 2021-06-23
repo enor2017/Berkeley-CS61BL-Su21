@@ -36,6 +36,9 @@ public class Account {
      * Subtract amount from the account if possible. If subtracting amount
      * would leave a negative balance, print an error message and leave the
      * balance unchanged.
+     *
+     * @author : enor2017
+     * Visualizer test: https://cscircles.cemc.uwaterloo.ca/java_visualize/#mode=display
      */
     public boolean withdraw(int amount) {
         if (amount < 0) {
