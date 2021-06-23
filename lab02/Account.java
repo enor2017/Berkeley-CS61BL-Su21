@@ -70,9 +70,7 @@ public class Account {
      * and depositing it into this account.
      */
     public void merge(Account other) {
-        // cannot visit other.balance directly.
-        int otherBalance = other.getBalance();
-        balance += otherBalance;
-        other.withdraw(otherBalance);
+        balance += other.balance;
+        other.balance = 0;
     }
 }
