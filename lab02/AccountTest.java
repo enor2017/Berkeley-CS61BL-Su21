@@ -14,7 +14,7 @@ public class AccountTest {
         System.out.println(!account.withdraw(9999));
         System.out.println(500 == account.getBalance());
         System.out.println("All print statements should be true");
-        System.out.println("Note: The above output may contain 'Insufficient Funds'. This is okay.");
+        System.out.println("Note: The above output may contain 'Insufficient Funds'. This is okay.\n");
     }
 
     public static void testMerge() {
@@ -24,7 +24,7 @@ public class AccountTest {
         one.merge(two);
         System.out.println(0 == two.getBalance());
         System.out.println(200 == one.getBalance());
-        System.out.println("Both print statements should be true");
+        System.out.println("Both print statements should be true\n");
     }
 
     public static void testParent() {
@@ -37,6 +37,29 @@ public class AccountTest {
         System.out.println(child.withdraw(55));
         System.out.println(0 == child.getBalance());
         System.out.println(995 == parent.getBalance());
+        System.out.println("All print statements should be true\n");
+    }
+
+    /**
+     * Test many parent accounts
+     * @author: enor2017
+     */
+    public static void testManyParentAccounts(){
+        System.out.println("Making recursively defined parent accounts");
+        Account grandGrandParent = new Account(1000);
+        Account grandParent = new Account(1000, grandGrandParent);
+        Account parent = new Account(500, grandParent);
+        Account child = new Account(100, parent);
+        System.out.println(child.withdraw(50));
+        System.out.println(child.withdraw(50));
+        System.out.println(child.getBalance() == 0);
+        System.out.println(parent.getBalance() == 500);
+        System.out.println(child.withdraw(500));
+        System.out.println(child.getBalance() == 0);
+        System.out.println(parent.getBalance() == 0);
+        System.out.println(child.withdraw(1500));
+        System.out.println(grandParent.getBalance() == 0);
+        System.out.println(grandGrandParent.getBalance() == 500);
         System.out.println("All print statements should be true");
     }
 
@@ -45,5 +68,6 @@ public class AccountTest {
         testWithdraw();
         testMerge();
         testParent();
+        testManyParentAccounts();
     }
 }
