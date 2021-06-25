@@ -9,6 +9,8 @@ public class DebugExercise3 {
             if (foodType.equals("turnip")) {
                 int newTotal = totalTurnips + numAvailable;
                 totalTurnips = newTotal;
+                // Problem: Data in csv file is negative
+                // Line 89: kroger turnip 0.45 -387128732
             }
         }
         return totalTurnips;

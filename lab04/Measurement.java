@@ -1,11 +1,13 @@
 public class Measurement {
 
+    private int feet, inches;
+
     /**
      * Constructor: initialize this object to be a measurement of 0 feet, 0
      * inches
      */
     public Measurement() {
-
+        feet = inches = 0;
     }
 
     /**
@@ -13,7 +15,8 @@ public class Measurement {
      * the number of inches
      */
     public Measurement(int feet) {
-
+        this.feet = feet;
+        this.inches = 0;
     }
 
     /**
@@ -22,7 +25,8 @@ public class Measurement {
      * initialization
      */
     public Measurement(int feet, int inches) {
-
+        this.feet = feet;
+        this.inches = inches;
     }
 
     /**
@@ -30,7 +34,7 @@ public class Measurement {
      * Measurement has 1 foot and 6 inches, this method should return 1.
      */
     public int getFeet() {
-        return 0; // provided to allow the file to compile
+        return feet;
     }
 
     /**
@@ -38,12 +42,15 @@ public class Measurement {
      * Measurement has 1 foot and 6 inches, this method should return 6.
      */
     public int getInches() {
-        return 0; // provided to allow the file to compile
+        return inches;
     }
 
     /** Adds the argument m2 to the current measurement */
     public Measurement plus(Measurement m2) {
-        return new Measurement(); // provided to allow the file to compile
+        int newInch = inches + m2.inches;
+        int newFeet = feet + m2.feet + newInch / 12;
+        newInch %= 12;
+        return new Measurement(newFeet, newInch);
     }
 
     /**
@@ -51,7 +58,11 @@ public class Measurement {
      * that m2 will always be smaller than the current measurement.
      */
     public Measurement minus(Measurement m2) {
-        return new Measurement(); // provided to allow the file to compile
+        int totInch1 = feet * 12 + inches;
+        int totInch2 = m2.feet * 12 + m2.inches;
+        int resFeet = (totInch1 - totInch2) / 12;
+        int resInch = (totInch1 - totInch2) % 12;
+        return new Measurement(resFeet, resInch);
     }
 
     /**
@@ -61,7 +72,10 @@ public class Measurement {
      * (3) should return an object that represents 1 foot, 9 inches.
      */
     public Measurement multiple(int multipleAmount) {
-        return new Measurement(); // provided to allow the file to compile
+        int totInch = (feet * 12 + inches) * multipleAmount;
+        int resFeet = totInch / 12;
+        int resInch = totInch % 12;
+        return new Measurement(resFeet, resInch);
     }
 
     /**
@@ -72,7 +86,7 @@ public class Measurement {
      */
     @Override
     public String toString() {
-        return new String(); // provided to allow the file to compile
+        return feet + "'" + inches + "\"";
     }
 
 }
