@@ -121,22 +121,17 @@ public class Model extends Observable {
 
     /**
      * helper function:
-     * continuously go up from the given row, return the LAST empty tile
-     * if no, return -1
+     * go from up to bottom, return the top empty cell above (row, col)
+     * if does not exist, return -1
      */
     public int top_space(int col, int row){
         int size = board.size();
-        int i = 0;
-        for(i = row + 1; i < size; ++i){
-            if(board.tile(col, i) != null) break;
+        for(int i = size - 1; i > row; --i){
+            if(board.tile(col, i) == null){
+                return i;
+            }
         }
-        i--;
-        if(i == row){
-            // this means no space above the current tile
-            return -1;
-        }else{
-            return i;
-        }
+        return -1;
     }
 
     /**
@@ -158,10 +153,7 @@ public class Model extends Observable {
 
         for(int i = size - 2; i >= 0; --i){
             // current cell: (col, i)
-            // upper cell: (col, i + 1) (MAY not have)
             Tile current_cell = board.tile(col, i);
-            Tile upper_cell = null;
-            if(i <= size - 2) upper_cell = board.tile(col, i + 1);
 
             // 1. If current cell is null, do nothing.
             if(current_cell == null) continue;
@@ -169,19 +161,43 @@ public class Model extends Observable {
             // 2. find if there is any blank space
             int blank_space = top_space(col, i);
             if(blank_space != -1){
-                // move current cell to that one
-                board.move(col, blank_space, current_cell);
+                // find if it can be merged with upper cell AFTER
+                // move to that blank space
+                Tile upperTileAfterMove = null;
+                if(blank_space + 1 < size) {
+                    upperTileAfterMove = board.tile(col, blank_space + 1);
+                }
+                if(upperTileAfterMove != null
+                        && current_cell.value() == upperTileAfterMove.value()
+                        && (!forbid_merge[blank_space + 1])){
+                    // merge!
+                    board.move(col, blank_space + 1, current_cell);
+                    // update score
+                    score += (current_cell.value() * 2);
+                    // cannot be merged again
+                    forbid_merge[blank_space + 1] = true;
+                }else{
+                    // can't be merged, so we just move
+                    board.move(col, blank_space, current_cell);
+                    // No score update.
+                }
+
                 // declare change
                 changed = true;
-                // No score update.
-                // start next loop with CURRENT i. (IMPORTANT)
-                i = blank_space + 1;
+
                 continue;
             }
 
             // 3. Otherwise, find if it can be merged with upper cell
-            // JUMP if current cell is at top, so that no upper_cell available
-            if(i == size - 1) continue;
+            Tile upper_cell = null;
+            // if doesn't have upper_cell, or upper_cell is empty, continue
+            if(i <= size - 2) {
+                upper_cell = board.tile(col, i + 1);
+            }
+            if(upper_cell == null){
+                continue;
+            }
+            // now that have upper cell, check whether merge is available
             if((current_cell.value() == upper_cell.value()) && (!forbid_merge[i + 1])){
                 int original_value = current_cell.value();
                 // merge!
@@ -192,8 +208,6 @@ public class Model extends Observable {
                 score += (original_value * 2);
                 // cannot be merged again
                 forbid_merge[i + 1] = true;
-                // start next loop with CURRENT i. (IMPORTANT)
-                i = i + 1;
 
                 continue;
             }
