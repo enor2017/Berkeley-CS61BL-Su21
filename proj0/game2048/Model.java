@@ -124,7 +124,7 @@ public class Model extends Observable {
      * go from up to bottom, return the top empty cell above (row, col)
      * if does not exist, return -1
      */
-    public int top_space(int col, int row){
+    private int top_space(int col, int row){
         int size = board.size();
         for(int i = size - 1; i > row; --i){
             if(board.tile(col, i) == null){
@@ -143,7 +143,7 @@ public class Model extends Observable {
      * 3. Update score
      * 4. Declare change
      */
-    public boolean tilt_col(int col){
+    private boolean tilt_col(int col){
         boolean changed = false;
         int size = board.size();
 
