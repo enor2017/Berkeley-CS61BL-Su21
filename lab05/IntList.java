@@ -49,8 +49,18 @@ public class IntList {
      * @return The element at [position]
      */
     public int get(int position) {
-        //TODO: YOUR CODE HERE
-        return -1;
+        // if negative position, throw exception
+        if(position < 0) {
+            throw new IllegalArgumentException("negative position, cannot get!");
+        }
+        IntList p = this;
+        for(int i = 0; i < position; ++i){
+            if(p.next == null){
+                throw new IllegalArgumentException("position out of bound, cannot get!");
+            }
+            p = p.next;
+        }
+        return p.item;
     }
 
     /**
@@ -60,8 +70,18 @@ public class IntList {
      * @return The String representation of the list.
      */
     public String toString() {
-        //TODO: YOUR CODE HERE
-        return null;
+        String res = "";
+        IntList p = this;
+        while(p != null){
+            res = res + p.item;
+            // if p is not the last element, append a space
+            if(p.next != null) {
+                res += " ";
+            }
+            // move onto next
+            p = p.next;
+        }
+        return res;
     }
 
     /**
@@ -82,10 +102,25 @@ public class IntList {
             return false;
         }
         IntList otherLst = (IntList) obj;
-
-        //TODO: YOUR CODE HERE
-
-        return false;
+        IntList thisLst = this;
+        while(thisLst != null){
+            // if different lengths
+            if(otherLst == null) {
+                return false;
+            }
+            // if different items
+            if(thisLst.item != otherLst.item){
+                return false;
+            }
+            // otherwise, move onto next
+            thisLst = thisLst.next;
+            otherLst = otherLst.next;
+        }
+        // if B longer than A: (different lengths)
+        if(otherLst != null) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -94,7 +129,12 @@ public class IntList {
      * @param value, the int to be added.
      */
     public void add(int value) {
-        //TODO: YOUR CODE HERE
+        // in IntList, the list will never be empty
+        IntList p = this;
+        while(p.next != null) {
+            p = p.next;
+        }
+        p.next = new IntList(value);
     }
 
     /**
@@ -103,8 +143,15 @@ public class IntList {
      * @return smallest element in the list
      */
     public int smallest() {
-        //TODO: YOUR CODE HERE
-        return -1;
+        int res = 99999999;
+        IntList p = this;
+        while(p != null) {
+            if(res > p.item) {
+                res = p.item;
+            }
+            p = p.next;
+        }
+        return res;
     }
 
     /**
@@ -113,8 +160,13 @@ public class IntList {
      * @return The sum of squares of all elements.
      */
     public int squaredSum() {
-        //TODO: YOUR CODE HERE
-        return -1;
+        int res = 0;
+        IntList p = this;
+        while(p != null) {
+            res += (p.item) * (p.item);
+            p = p.next;
+        }
+        return res;
     }
 
     /**
@@ -171,8 +223,17 @@ public class IntList {
      * @return new list with A followed by B.
      */
     public static IntList dcatenate(IntList A, IntList B) {
-        //TODO: YOUR CODE HERE
-        return null;
+        // move to last item in A
+        IntList p = A;
+        while(p.next != null) {
+            p = p.next;
+        }
+        while(B != null) {
+            p.next = new IntList(B.item);
+            p = p.next;
+            B = B.next;
+        }
+        return A;
     }
 
     /**
@@ -183,8 +244,35 @@ public class IntList {
      * @param B list to be on the back of the new list.
      * @return new list with A followed by B.
      */
+    /**
+     * Note by enor2017:
+     * I cannot afford a recursive method, but if it's ok to attach B to the end
+     * of A without making a full copy a B, a possible solution is attached below
+     *
+     * I've already modified test to strictly check whether B is fully copied,
+     * to test the recursive method below, comment out the last two lines of testCatenate()
+     */
+//    public static IntList catenate(IntList A, IntList B) {
+//        if(A != null) {
+//            return new IntList(A.item, catenate(A.next, B));
+//        } else {
+//            return new IntList(B.item, B.next);
+//        }
+//    }
      public static IntList catenate(IntList A, IntList B) {
-        //TODO: YOUR CODE HERE
-        return null;
+        IntList newList = new IntList(A.item, null);
+        IntList p = newList;
+        A = A.next;
+        while(A != null) {
+            p.next = new IntList(A.item, null);
+            A = A.next;
+            p = p.next;
+        }
+        while(B != null) {
+            p.next = new IntList(B.item, null);
+            B = B.next;
+            p = p.next;
+        }
+        return newList;
      }
 }

@@ -93,6 +93,9 @@ public class IntListTest {
 
         assertFalse(a.equals(IntList.of(1, 2, 3, 4)));
         assertFalse(a.equals(IntList.of(1, 2, 3, 5, 6)));
+
+        // if b is longer than a
+        assertFalse(a.equals(IntList.of(1, 2, 3, 4, 5, 6, 7)));
     }
 
     @Test
@@ -160,6 +163,17 @@ public class IntListTest {
 
         // Cannot modify A
         assertEquals(IntList.of(1, 2, 3), A);
+        res.item = 2;
+        assertEquals("While changing the result list, original lists should not be modified.",
+                IntList.of(1, 2, 3), A);
+
+        // Cannot modify B
+        assertEquals(IntList.of(4, 5, 6), B);
+
+        // If you comment the two lines below, my partial solution of recursive should pass
+        res.next.next.next.next.item = 4;
+        assertEquals("While changing the result list, original lists should not be modified.",
+                IntList.of(4, 5, 6), B);
     }
 
     @Test
