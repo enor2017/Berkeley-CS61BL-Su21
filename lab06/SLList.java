@@ -1,3 +1,6 @@
+import java.nio.file.Path;
+import java.security.InvalidParameterException;
+
 /**
  * An SLList is a list of integers, which encapsulates the
  * naked linked list structure.
@@ -118,11 +121,37 @@ public class SLList {
 
     /** Adds x to the list at the specified index. */
     public void add(int index, int x) {
-        // TODO
+        if (index < 0) {
+            throw new InvalidParameterException("index should not be negative.");
+        }
+        // if index larger than (size), resize it to (size)
+        if (index > size) {
+            index = size;
+        }
+        IntListNode p = sentinel;
+        for (int i = 0; i < index; ++i) {
+            p = p.next;
+        }
+        p.next = new IntListNode(x, p.next);
+        size++;
+    }
+
+    /**
+     * helper function: reverses list from first recursively
+     */
+    private IntListNode reverseList(IntListNode first) {
+        if (first.next == sentinel) {
+            sentinel.next = first;
+            return first;
+        }
+        IntListNode tmp = reverseList(first.next);
+        tmp.next = first;
+        return first;
     }
 
     /** Destructively reverses this list. */
     public void reverse() {
-        // TODO
+        IntListNode endOfRevList = reverseList(sentinel.next);
+        endOfRevList.next = sentinel;
     }
 }
