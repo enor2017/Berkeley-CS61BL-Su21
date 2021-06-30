@@ -174,6 +174,11 @@ public class IntListTest {
         res.next.next.next.next.item = 4;
         assertEquals("While changing the result list, original lists should not be modified.",
                 IntList.of(4, 5, 6), B);
+
+        // Test A or B is null
+        assertEquals(A, IntList.catenate(A, null));
+        assertEquals(B, IntList.catenate(null, B));
+        assertEquals(null, IntList.catenate(null, null));
     }
 
     @Test
@@ -190,5 +195,10 @@ public class IntListTest {
         assertEquals(IntList.of(1, 2, 3, 4, 5, 6), A);
         A.item = 7;
         assertEquals(A.item, res.item);
+
+        // Test A or B is null
+        assertEquals(A, IntList.catenate(A, null));
+        assertEquals(B, IntList.catenate(null, B));
+        assertEquals(null, IntList.catenate(null, null));
     }
 }

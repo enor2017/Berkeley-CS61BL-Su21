@@ -223,6 +223,11 @@ public class IntList {
      * @return new list with A followed by B.
      */
     public static IntList dcatenate(IntList A, IntList B) {
+        if(A == null) {
+            return B;
+        } else if (B == null) {
+            return A;
+        }
         // move to last item in A
         IntList p = A;
         while(p.next != null) {
@@ -260,6 +265,11 @@ public class IntList {
 //        }
 //    }
      public static IntList catenate(IntList A, IntList B) {
+        if(A == null && B == null) {
+            return null;
+        } else if (A == null) {
+            return catenate(B, null);
+        }
         IntList newList = new IntList(A.item, null);
         IntList p = newList;
         A = A.next;
