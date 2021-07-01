@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class ExtraCodingChallenges {
 
     /**
@@ -17,7 +20,22 @@ public class ExtraCodingChallenges {
      */
     public static String nearestDuplicate(String[] words) {
         int min = Integer.MAX_VALUE;
-        // TODO
-        return null;
+        String result = null;
+        Map<String, Integer> map = new HashMap<>();
+        for(int i = 0; i < words.length; ++i) {
+            // if not contains current word, insert into map
+            // if contains, check distance and update to new position
+            if(!map.containsKey(words[i])) {
+                map.put(words[i], i);
+            } else {
+                int lastPos = map.get(words[i]);
+                if(i - lastPos < min) {
+                    min = i - lastPos;
+                    result = words[i];
+                }
+                map.put(words[i], i);
+            }
+        }
+        return result;
     }
 }
