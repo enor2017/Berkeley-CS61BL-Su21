@@ -35,4 +35,37 @@ public class BooleanSetTest {
         assertTrue(aSet.isEmpty());
         assertEquals(0, aSet.size());
     }
+
+    @Test
+    public void testToIntArray() {
+        BooleanSet aSet = new BooleanSet(100);
+        assertArrayEquals(new int[]{}, aSet.toIntArray());
+
+        aSet.add(1);
+        assertArrayEquals(new int[]{1}, aSet.toIntArray());
+
+        aSet.add(1);
+        assertArrayEquals(new int[]{1}, aSet.toIntArray());
+
+        aSet.add(2);
+        assertArrayEquals(new int[]{1, 2}, aSet.toIntArray());
+
+        aSet.add(3);
+        assertArrayEquals(new int[]{1, 2, 3}, aSet.toIntArray());
+
+        aSet.add(1);
+        assertArrayEquals(new int[]{1, 2, 3}, aSet.toIntArray());
+
+        aSet.add(2);
+        assertArrayEquals(new int[]{1, 2, 3}, aSet.toIntArray());
+
+        aSet.add(3);
+        assertArrayEquals(new int[]{1, 2, 3}, aSet.toIntArray());
+
+        aSet.remove(1);
+        assertArrayEquals(new int[]{2, 3}, aSet.toIntArray());
+
+        aSet.remove(1);
+        assertArrayEquals(new int[]{2, 3}, aSet.toIntArray());
+    }
 }
