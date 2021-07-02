@@ -127,34 +127,28 @@ public class ArrayDequeTest {
     }
 
     @Test
-    /* check getRecursive() */
-    public void getRecursiveTest() {
-        assertEquals("Should return null when getRecursive(0) from empty list", null, ad.getRecursive(0));
-        assertEquals("Should return null when getRecursive(1) from empty list", null, ad.getRecursive(1));
+    public void resizeTest() {
+        assertEquals("Should return null when removeFirst is called on an empty Deque,", null, ad.removeFirst());
+        assertEquals("Should return null when removeLast is called on an empty Deque,", null, ad.removeLast());
+        for(int i = 0; i < 10000; ++i) {
+            ad.addFirst(i);
+            ad.addLast(20000 + i);
+        }
+        assertEquals(20000, ad.size());
 
-        ad.addFirst(3);
-        assertEquals(3, (int)ad.getRecursive(0));
-        assertEquals("Should return null when getRecursive(1) from list:[3]", null, ad.getRecursive(1));
-        assertEquals("Should return null when getRecursive(4) from list:[3]", null, ad.getRecursive(4));
-        assertEquals("Should return null when getRecursive(-5) from list:[3]", null, ad.getRecursive(-5));
+        int countSize = 20000;
+        for(int i = 0; i < 10000; ++i) {
+            ad.removeFirst();
+            assertEquals(--countSize, ad.size());
+            ad.removeLast();
+            assertEquals(--countSize, ad.size());
+        }
 
-        ad.addFirst(7);
-        ad.addFirst(18);
-        ad.addLast(6);
-        ad.addFirst(19);
-        ad.addLast(44);
-        ad.addFirst(2);
-        // ad: [2, 19, 18, 7, 3, 6, 44]
-        assertEquals(2, (int)ad.getRecursive(0));
-        assertEquals(19, (int)ad.getRecursive(1));
-        assertEquals(18, (int)ad.getRecursive(2));
-        assertEquals(7, (int)ad.getRecursive(3));
-        assertEquals(3, (int)ad.getRecursive(4));
-        assertEquals(6, (int)ad.getRecursive(5));
-        assertEquals(44, (int)ad.getRecursive(6));
-        assertEquals("Should return null when getRecursive(7) from list:[2, 19, 18, 7, 3, 6, 44]", null, ad.getRecursive(7));
-        assertEquals("Should return null when getRecursive(100) from list:[2, 19, 18, 7, 3, 6, 44]", null, ad.getRecursive(100));
-        assertEquals("Should return null when getRecursive(-5) from list:[2, 19, 18, 7, 3, 6, 44]", null, ad.getRecursive(-5));
+        ad.removeFirst();
+        assertEquals(0, ad.size());
+        ad.removeLast();
+        assertEquals(0, ad.size());
+
 
         // Reset the linked list deque at the END of the test.
         ad = new LinkedListDeque<Integer>();
