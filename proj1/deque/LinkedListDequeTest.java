@@ -160,4 +160,32 @@ public class LinkedListDequeTest {
         lld = new LinkedListDeque<Integer>();
     }
 
+    @Test
+    public void equalsTest() {
+        LinkedListDeque<Integer> test = new LinkedListDeque<>();
+        assertTrue(lld.equals(test));
+
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+        assertFalse(lld.equals(ad));
+
+        test.addFirst(1);
+        lld.addFirst(1);
+        assertTrue(lld.equals(test));
+
+        test.addFirst(1);
+        assertFalse(lld.equals(test));
+
+        lld.addLast(1);
+        assertTrue(lld.equals(test));
+
+        test.addFirst(2);
+        test.addLast(4);
+        lld.addFirst(4);
+        lld.addLast(2);
+        assertFalse(lld.equals(test));
+
+        // Reset the linked list deque at the END of the test.
+        lld = new LinkedListDeque<Integer>();
+    }
+
 }

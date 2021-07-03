@@ -129,4 +129,33 @@ public class LinkedListDeque<T> implements Deque<T>{
 
         return getNodeRecursive(sentinel.next, index).value;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        // if null, or not same class type, return false
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        // safely cast object to LinkedListDeque type
+        LinkedListDeque<T> lld = (LinkedListDeque<T>) o;
+
+        // if size mismatch, return false
+        if(size != lld.size) {
+            return false;
+        }
+
+        ListNode l1 = sentinel.next;
+        ListNode l2 = lld.sentinel.next;
+
+        // (node == sentinel) means we've reached the end
+        while (l1 != sentinel && l2 != lld.sentinel) {
+            if (!(l1.value).equals(l2.value)) {
+                return false;
+            }
+            l1 = l1.next;
+            l2 = l2.next;
+        }
+        return true;
+    }
 }

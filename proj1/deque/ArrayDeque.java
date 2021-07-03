@@ -149,4 +149,28 @@ public class ArrayDeque<T> implements Deque<T>{
         return array[(start + 1 + index) % array.length];
     }
 
+    @Override
+    public boolean equals(Object o) {
+        // if null, or not same class type, return false
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        // safely cast object to ArrayDeque type
+        ArrayDeque<T> ad = (ArrayDeque<T>) o;
+
+        // if size mismatch, return false
+        if(size != ad.size) {
+            return false;
+        }
+
+        for(int i = 0; i < size; ++i) {
+            if(!get(i).equals(ad.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
