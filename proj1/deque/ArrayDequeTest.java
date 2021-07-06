@@ -160,11 +160,18 @@ public class ArrayDequeTest {
         assertTrue(ad.equals(test));
 
         LinkedListDeque<Integer> lld = new LinkedListDeque<>();
-        assertFalse(ad.equals(lld));
+        assertTrue("We consider them equal as long as they're both deque " +
+                "and their contents are equal", ad.equals(lld));
+
+        String str = "";
+        assertFalse("String is not a deque, cannot equal!", ad.equals(str));
 
         test.addFirst(1);
         ad.addFirst(1);
         assertTrue(ad.equals(test));
+        assertFalse(ad.equals(lld));
+        lld.addLast(1);
+        assertTrue(ad.equals(lld));
 
         test.addFirst(1);
         assertFalse(ad.equals(test));

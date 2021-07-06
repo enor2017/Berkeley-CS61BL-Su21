@@ -149,23 +149,34 @@ public class ArrayDeque<T> implements Deque<T>{
         return array[(start + 1 + index) % array.length];
     }
 
+    /**
+     * check whether two deque is equal.
+     * Even if two deque belongs to different subclass,
+     * as long as their items are the same, we'll consider them equal
+     */
     @Override
     public boolean equals(Object o) {
-        // if null, or not same class type, return false
-        if (o == null || getClass() != o.getClass()) {
+        // if null, return false
+        if (o == null) {
             return false;
         }
 
-        // safely cast object to ArrayDeque type
-        ArrayDeque<T> ad = (ArrayDeque<T>) o;
+        // if not a deque, return false
+        if(!(o instanceof Deque)) {
+            return false;
+        }
+
+        // cast object to a Deque
+        Deque<T> d = (Deque<T>) o;
 
         // if size mismatch, return false
-        if(size != ad.size) {
+        if(size != d.size()) {
             return false;
         }
 
         for(int i = 0; i < size; ++i) {
-            if(!get(i).equals(ad.get(i))) {
+            // if not equals, return false
+            if(!get(i).equals(d.get(i))) {
                 return false;
             }
         }

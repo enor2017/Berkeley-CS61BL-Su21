@@ -130,32 +130,38 @@ public class LinkedListDeque<T> implements Deque<T>{
         return getNodeRecursive(sentinel.next, index).value;
     }
 
+    /**
+     * check whether two deque is equal.
+     * Even if two deque belongs to different subclass,
+     * as long as their items are the same, we'll consider them equal
+     */
     @Override
     public boolean equals(Object o) {
-        // if null, or not same class type, return false
-        if (o == null || getClass() != o.getClass()) {
+        // if null, return false
+        if (o == null) {
             return false;
         }
 
-        // safely cast object to LinkedListDeque type
-        LinkedListDeque<T> lld = (LinkedListDeque<T>) o;
+        // if not deque, return false
+        if(!(o instanceof Deque)) {
+            return false;
+        }
+
+        // cast object to Deque
+        Deque<T> d = (Deque<T>) o;
 
         // if size mismatch, return false
-        if(size != lld.size) {
+        if(size != d.size()) {
             return false;
         }
 
-        ListNode l1 = sentinel.next;
-        ListNode l2 = lld.sentinel.next;
-
-        // (node == sentinel) means we've reached the end
-        while (l1 != sentinel && l2 != lld.sentinel) {
-            if (!(l1.value).equals(l2.value)) {
+        for(int i = 0; i < size; ++i) {
+            // if not equals, return false
+            if(!get(i).equals(d.get(i))) {
                 return false;
             }
-            l1 = l1.next;
-            l2 = l2.next;
         }
+
         return true;
     }
 }
