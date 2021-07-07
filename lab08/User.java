@@ -77,16 +77,20 @@ public class User implements Comparable<User>{
 
     @Override
     public int compareTo(User o) {
-        return this.id - o.id;
+        if(this.id != o.id) {
+            return this.id - o.id;
+        } else {
+            return this.name.compareTo(o.name);
+        }
     }
 
     public static void main(String[] args) {
         User[] users = {
-            new User(2, "Matt", ""),
-            new User(4, "Zoe", ""),
-            new User(5, "Alex", ""),
-            new User(1, "Shreya", ""),
-            new User(1, "Connor", "")
+                new User(2, "Nandini", ""),
+                new User(4, "Zoe", ""),
+                new User(5, "Allyson", ""),
+                new User(1, "Sohum", ""),
+                new User(1, "Jedi", "")
         };
         Arrays.sort(users);
         for (User user : users) {
