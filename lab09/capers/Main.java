@@ -1,6 +1,8 @@
 package capers;
 
 import java.io.File;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 /** Canine Capers: A Gitlet Prelude.
  * @author Sean Dooher
@@ -10,7 +12,12 @@ public class Main {
     static final File CWD = new File(".");
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = null; // FIXME
+    static final File CAPERS_FOLDER = new File(".capers/");
+
+    /** Data file pointers. */
+    static final File capersDir = new File(".capers/");
+    static final File dogsDir = new File(".capers/dogs/");
+    static final File storyFile = new File(".capers/story");
 
     /**
      * Runs one of three commands:
@@ -44,12 +51,18 @@ public class Main {
         if (args.length == 0) {
             exitWithError("Must have at least one argument");
         }
+//        System.out.println("args: " + Arrays.toString(args));
         setupPersistence();
         switch (args[0]) {
             case "story":
                 writeStory(args);
                 break;
-            // FIXME
+            case "dog":
+                makeDog(args);
+                break;
+            case "birthday":
+                celebrateBirthday(args);
+                break;
             default:
                 exitWithError(String.format("Unknown command: %s", args[0]));
         }
@@ -67,7 +80,17 @@ public class Main {
      *
      */
     public static void setupPersistence() {
-        // FIXME
+        // Data file pointers have been declared at the top of this file
+        // Create folder/file only if does not exists.
+        if (!capersDir.exists()) {
+            capersDir.mkdir();
+        }
+        if (!dogsDir.exists()) {
+            dogsDir.mkdir();
+        }
+        if (!storyFile.exists()) {
+            Utils.writeContents(storyFile, ""); // create an empty file
+        }
     }
 
     /**
@@ -78,7 +101,14 @@ public class Main {
      */
     public static void writeStory(String[] args) {
         validateNumArgs("story", args, 2);
-        // FIXME
+
+        // get old contents, then joins old with new
+        String oldContents = Utils.readContentsAsString(storyFile);
+        String newContents = oldContents + args[1];
+
+        // Do not forget to append a newline
+        Utils.writeContents(storyFile, newContents + "\n");
+        System.out.println(newContents);
     }
 
     /**
@@ -86,11 +116,19 @@ public class Main {
      * three non-command arguments of args (name, breed, age).
      * Also prints out the dog's information using toString().
      * If the user inputs an invalid age, call exitWithError()
-     * @param args Array in format: {'story', name, breed, age}
+     * @param args Array in format: {'dog', name, breed, age}
      */
     public static void makeDog(String[] args) {
         validateNumArgs("dog", args, 4);
-        // FIXME
+        // check validity of age using exception
+        Dog newDog = null;
+        try {
+            newDog = new Dog(args[1], args[2], Integer.parseInt(args[3]));
+        } catch (NumberFormatException e) {
+            exitWithError("Invalid age for dog! Input: " + args[3] + ", expect an Integer.");
+        }
+        newDog.saveDog();
+        System.out.println(newDog);
     }
 
     /**
@@ -102,7 +140,19 @@ public class Main {
      */
     public static void celebrateBirthday(String[] args) {
         validateNumArgs("birthday", args, 2);
-        // FIXME
+
+        // if correspond dog data file does not exist, throw exception
+        Dog currentDog = null;
+        try {
+            currentDog = Dog.fromFile(args[1]);
+        } catch (Exception e) {
+            // I don't know exactly which exception will be thrown
+            // so just Exception....
+            exitWithError("The dog you're celebrating birthday does not exist!");
+        }
+        currentDog.haveBirthday();
+        // need to save the new dog in order to update age
+        currentDog.saveDog();
     }
 
     /**

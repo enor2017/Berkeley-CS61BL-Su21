@@ -3,10 +3,10 @@ import java.util.Properties;
 public class GetEnvironmentVariables {
 
     //  Fill in the path to your su21-p*** folder between the quotes
-    public static String REPO_DIR = "";
+    public static String REPO_DIR = "/Users/dog/Desktop/Berkeley-CS61BL-Su21";
 
     // Fill in the type of your shell by running 'echo $0` in your terminal. It should be zsh or bash.
-    public static String SHELL = "";
+    public static String SHELL = "zsh";
 
     public static void main(String[] args) {
 
