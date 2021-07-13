@@ -41,3 +41,11 @@ public class Sorter {
         }
     }
 }
+
+/**
+ * Test result:
+ * java Sorter 99890
+ * 1001 milliseconds elapsed
+ * java Sorter 99889
+ * 997 milliseconds elapsed
+ */
