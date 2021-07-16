@@ -11,32 +11,40 @@ public class UnionFind {
         }
     }
 
-    /* Returns the size of the set V belongs to. */
-    public int sizeOf(int v) {
-        if (v >= parent.length) {
+    /**
+     * helper function to check whether argument is legal
+     * if illegal, throw exception
+     */
+    private void checkLegalArgument(int v) {
+        if (v >= parent.length || v < 0) {
             throw new IllegalArgumentException();
         }
+    }
+
+    /* Returns the size of the set V belongs to. */
+    public int sizeOf(int v) {
+        checkLegalArgument(v);
+
         if (parent[v] < 0) {
             return -parent[v];
         } else {
-            return -parent[parent(v)];
+            return -parent[find(v)];
         }
     }
 
     /* Returns the parent of V. If V is the root of a tree, returns the
        negative size of the tree for which V is the root. */
     public int parent(int v) {
-        if (v >= parent.length) {
-            throw new IllegalArgumentException();
-        }
+        checkLegalArgument(v);
+
         return parent[v];
     }
 
     /* Returns true if nodes V1 and V2 are connected. */
     public boolean connected(int v1, int v2) {
-        if (v1 >= parent.length || v2 >= parent.length) {
-            throw new IllegalArgumentException();
-        }
+        checkLegalArgument(v1);
+        checkLegalArgument(v2);
+
         return find(v1) == find(v2);
     }
 
@@ -44,9 +52,8 @@ public class UnionFind {
        allowing for fast search-time. If invalid items are passed into this
        function, throw an IllegalArgumentException. */
     public int find(int v) {
-        if (v > parent.length) {
-            throw new IllegalArgumentException();
-        }
+        checkLegalArgument(v);
+
         /**
          * if a root node, return itself
          * otherwise, recursively find its parent's root,
