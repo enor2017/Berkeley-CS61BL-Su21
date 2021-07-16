@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 /* An AmoebaFamily is a tree, where nodes are Amoebas, each of which can have
    any number of children. */
@@ -51,6 +50,9 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
     public Iterator<Amoeba> iterator() {
         return new AmoebaDFSIterator();
     }
+    public Iterator<Amoeba> BFSiterator() {
+        return new AmoebaBFSIterator();
+    }
 
     /* Creates a new AmoebaFamily and prints it out. */
     public static void main(String[] args) {
@@ -69,6 +71,12 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
         family.addChild("Marge", "Hilary");
         System.out.println("Here's the family:");
         family.print();
+
+        System.out.println("------------");
+        Iterator<Amoeba> it = family.iterator();
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
     }
 
     /* An Amoeba is a node of an AmoebaFamily. */
@@ -156,21 +164,31 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        O(N) operations. */
     public class AmoebaDFSIterator implements Iterator<Amoeba> {
 
-        // TODO: IMPLEMENT THE CLASS HERE
+        private Stack<Amoeba> fringe = new Stack<>();
 
         /* AmoebaDFSIterator constructor. Sets up all of the initial information
            for the AmoebaDFSIterator. */
         public AmoebaDFSIterator() {
+            if (root != null) {
+                fringe.push(root);
+            }
         }
 
         /* Returns true if there is a next element to return. */
         public boolean hasNext() {
-            return false;
+            return !fringe.isEmpty();
         }
 
         /* Returns the next element. */
         public Amoeba next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("tree ran out of elements");
+            }
+            Amoeba node = fringe.pop();
+            for (int i = node.children.size() - 1; i >= 0; --i) {
+                fringe.push(node.children.get(i));
+            }
+            return node;
         }
 
         public void remove() {
@@ -183,21 +201,31 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        O(N) operations. */
     public class AmoebaBFSIterator implements Iterator<Amoeba> {
 
-        // TODO: IMPLEMENT THE CLASS HERE
+        private Queue<Amoeba> fringe = new LinkedList<>();
 
         /* AmoebaBFSIterator constructor. Sets up all of the initial information
            for the AmoebaBFSIterator. */
         public AmoebaBFSIterator() {
+            if (root != null) {
+                fringe.add(root);
+            }
         }
 
         /* Returns true if there is a next element to return. */
         public boolean hasNext() {
-            return false;
+            return !fringe.isEmpty();
         }
 
         /* Returns the next element. */
         public Amoeba next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("tree ran out of elements");
+            }
+            Amoeba node = fringe.remove();
+            for (int i = 0; i < node.children.size(); ++i) {
+                fringe.add(node.children.get(i));
+            }
+            return node;
         }
 
         public void remove() {

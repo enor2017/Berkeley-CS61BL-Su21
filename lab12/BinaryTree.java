@@ -1,8 +1,3 @@
-import com.sun.source.tree.Tree;
-
-import javax.swing.tree.TreeNode;
-import java.nio.file.Paths;
-
 public class BinaryTree<T> {
 
     TreeNode<T> root;
