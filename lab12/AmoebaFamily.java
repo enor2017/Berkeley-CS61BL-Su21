@@ -26,7 +26,9 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        the ROOT Amoeba printed first. Each Amoeba should be indented four spaces
        more than its parent. */
     public void print() {
-        // TODO: YOUR CODE HERE
+        if (root != null) {
+            root.printHelper(0);
+        }
     }
 
     /* Returns the length of the longest name in this AmoebaFamily. */
@@ -39,7 +41,9 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
 
     /* Returns the longest name in this AmoebaFamily. */
     public String longestName() {
-        // TODO: YOUR CODE HERE
+        if (root != null) {
+            return root.longestNameHelper();
+        }
         return "";
     }
 
@@ -93,7 +97,7 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
         }
 
         /* Adds child with name CHILDNAME to an Amoeba with name PARENTNAME. */
-        public void addChildHelper(String parentName, String childName) {
+        private void addChildHelper(String parentName, String childName) {
             if (name.equals(parentName)) {
                 Amoeba child = new Amoeba(childName, this);
                 children.add(child);
@@ -106,7 +110,7 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
 
         /* Returns the length of the longest name between this Amoeba and its
            children. */
-        public int longestNameLengthHelper() {
+        private int longestNameLengthHelper() {
             int maxLengthSeen = name.length();
             for (Amoeba a : children) {
                 maxLengthSeen = Math.max(maxLengthSeen,
@@ -115,7 +119,35 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
             return maxLengthSeen;
         }
 
-        // TODO: ADD HELPER FUNCTIONS HERE
+        /**
+         * helper function for print
+         * @param depth: how many tabs to print
+         */
+        private void printHelper(int depth) {
+             System.out.println(this);
+             for (Amoeba a : children) {
+                 for (int i = 0; i <= depth; ++i) {
+                     System.out.print("\t");
+                 }
+                 a.printHelper(depth + 1);
+             }
+        }
+
+        /**
+         * helper function for longest name, mimic longestNameLengthHelper
+         */
+        private String longestNameHelper() {
+            int maxLength = name.length();
+            String longestName = name;
+            for(Amoeba a : children) {
+                String childLongest = a.longestNameHelper();
+                if (maxLength < childLongest.length()) {
+                    longestName = childLongest;
+                    maxLength = longestName.length();
+                }
+            }
+            return longestName;
+        }
 
     }
 

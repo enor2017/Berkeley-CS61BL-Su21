@@ -1,3 +1,8 @@
+import com.sun.source.tree.Tree;
+
+import javax.swing.tree.TreeNode;
+import java.nio.file.Paths;
+
 public class BinaryTree<T> {
 
     TreeNode<T> root;
@@ -16,21 +21,54 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        if (root == null) {
+            return 0;
+        }
+        return root.heightHelper();
     }
 
     /* Returns true if the tree's left and right children are the same height
        and are themselves completely balanced. */
     public boolean isCompletelyBalanced() {
-        // TODO: YOUR CODE HERE
-        return false;
+        if (root == null) {
+            return true;
+        }
+        return root.isCompletelyBalancedHelper();
     }
 
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
-        BinaryTree<Integer> result = new BinaryTree<Integer>();
-        return null;
+        BinaryTree<Integer> result = new BinaryTree<>();
+        result.root = fibHelper(N);
+        return result;
+    }
+
+    /**
+     * fib Helper function: return a TreeNode with fib N
+     */
+    public static TreeNode<Integer> fibHelper(int n) {
+        if (n == 0 || n == 1) {
+            return new TreeNode<>(n, null, null);
+        } else {
+            TreeNode<Integer> left = fibHelper(n - 1);
+            TreeNode<Integer> right = fibHelper(n - 2);
+            return new TreeNode<>(left.item + right.item, left, right);
+        }
+    }
+
+
+    /**
+     * fib test helper function: check if two BinaryTree equals
+     * For the sake of simplicity, we always assume Object is BinaryTree
+     */
+    @Override
+    public boolean equals(Object t) {
+        BinaryTree<T> tree = (BinaryTree<T>) t;
+        if (t == null) {
+            return false;
+        } else {
+            return this.root.equals(tree.root);
+        }
     }
 
     /* Print the values in the tree in preorder: root value first, then values
@@ -168,6 +206,61 @@ public class BinaryTree<T> {
             }
         }
 
-        // TODO: ADD HELPER METHODS HERE
+        /**
+         * helper function for getting height
+         */
+        private int heightHelper() {
+            if(item == null) {
+                return 0;
+            } else {
+                int leftDepth = (left == null) ? 0 : left.heightHelper();
+                int rightDepth = (right == null) ? 0 : right.heightHelper();
+                return 1 + Math.max(leftDepth, rightDepth);
+            }
+        }
+
+        /**
+         * helper function for isCompletelyBalanced
+         * if no nodes or one node, is balanced
+         * else, iff height(left) == height(right), and both completely balanced
+         */
+        private boolean isCompletelyBalancedHelper() {
+            if(item == null || (left == null && right == null)) {
+                return true;
+            } else {
+                return (left.heightHelper() == right.heightHelper()) &&
+                        left.isCompletelyBalancedHelper() &&
+                        right.isCompletelyBalancedHelper();
+            }
+        }
+
+        /**
+         * equals helper function: whether two treenodes are equal
+         * For the sake of simplicity, assume Object is always TreeNode
+         */
+        @Override
+        public boolean equals(Object o) {
+            TreeNode<T> t = (TreeNode<T>) o;
+            if (item == t.item) {
+                return true;
+            } else {
+                // if one's child is null but the other is not, return false
+                if(left == null ^ t.left == null) {
+                    return false;
+                }
+                if (right == null ^ t.right == null) {
+                    return false;
+                }
+
+                if (left != null && !left.equals(t.left)) {
+                    return false;
+                }
+                if (right != null && !right.equals(t.right)) {
+                    return false;
+                }
+                // reaching here means both children are null.
+                return true;
+            }
+        }
     }
 }
