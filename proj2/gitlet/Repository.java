@@ -3,6 +3,8 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 import static gitlet.Utils.*;
@@ -205,11 +207,35 @@ public class Repository implements Serializable {
         writeRepoToFile();
     }
 
+    /**
+     * helper function: render a commit into log style
+
+       ===
+       commit abcdefg...
+       Date: Thu Nov 9 20:00:05 2017 -0800
+       A commit message.
+
+     */
+    private void renderCommit(Commit commit) {
+        String hashValue = sha1obj(commit);
+        System.out.println("===");
+        System.out.println("commit " + hashValue);
+        Date commitDate = commit.getCommitTime();
+        SimpleDateFormat logFormat = new SimpleDateFormat("E MMM d HH:mm:ss yyyy ZZ");
+        System.out.println("Date: " + logFormat.format(commitDate));
+        System.out.println(commit.getMessage());
+    }
+
     public void log(String[] args) {
         // valid input
         checkOperand(args, 1);
 
-
+        Commit p = findCommit(HEAD);
+        renderCommit(p);
+        while(p.getParent() != null) {
+            p = findCommit(p.getParent());
+            renderCommit(p);
+        }
     }
 
 }

@@ -83,4 +83,19 @@ public class Commit implements Serializable {
     public void insertChild(String child) {
         children.add(child);
     }
+
+    // get parent of this commit
+    public String getParent() {
+        return parent;
+    }
+
+    // get commit message
+    public String getMessage() {
+        return message;
+    }
+
+    // get commit time
+    public Date getCommitTime() {
+        return commitTime;
+    }
 }

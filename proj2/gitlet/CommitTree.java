@@ -17,4 +17,8 @@ public class CommitTree implements Serializable {
     public CommitTree (String root) {
         this.root = root;
     }
+
+    public String getRoot() {
+        return root;
+    }
 }
