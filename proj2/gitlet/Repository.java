@@ -98,7 +98,7 @@ public class Repository implements Serializable {
     public static Commit findCommit(String hash) {
         File toFind = join(COMMIT_DIR, hash);
         // if file does not exist
-        if(!toFind.isFile()) {
+        if(!toFind.exists()) {
             return null;
         }
 
@@ -113,7 +113,7 @@ public class Repository implements Serializable {
     public static Blob findBlob(String hash) {
         File toFind = join(BLOB_DIR, hash);
         // if file does not exist
-        if(!toFind.isFile()) {
+        if(!toFind.exists()) {
             return null;
         }
 
@@ -194,8 +194,12 @@ public class Repository implements Serializable {
         // add commit to Commit Tree(just add to parent's child)
         Commit parentCommit = findCommit(HEAD);
         parentCommit.insertChild(newHash);
+        // notice that after insert child, parent's hash value changed
+        // we store it to a new file and delete original one
+//        restrictedDelete(join(COMMIT_DIR, HEAD));
+        String parentNewHash = sha1obj(parentCommit);
         // store commits to file
-        writeObject(join(COMMIT_DIR, HEAD), parentCommit);
+        writeObject(join(COMMIT_DIR, parentNewHash), parentCommit);
         writeObject(join(COMMIT_DIR, newHash), newCommit);
         // Update HEAD
         HEAD = newHash;
@@ -239,4 +243,75 @@ public class Repository implements Serializable {
         }
     }
 
+    public void rm(String[] args) {
+        // valid input
+        checkOperand(args, 2);
+
+    }
+
+    /**
+     * helper function for :
+     * - checkout --[filename]
+     * - checkout --[commit id] --[filename]
+     *
+     * No need to check argument
+     */
+    private void checkoutFile(String filename, String commit) {
+        Commit currentCommit = findCommit(commit);
+        if(currentCommit == null) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
+        LinkedList<String> blobs = currentCommit.getHashOfBlobs();
+
+        for(int i = 0; i < blobs.size(); ++i) {
+            Blob thisBlob = findBlob(blobs.get(i));
+            // find in commit blobs? put it in the working directory
+            if(thisBlob.getFilename().equals(filename)) {
+                writeContents(join(CWD, filename), thisBlob.getContents());
+                return;
+            }
+        }
+        // not found? error message!
+        System.out.println("File does not exist in that commit.");
+    }
+
+    /**
+     * helper function for:
+     * - checkout [branch]
+     *
+     * no need to check argument
+     */
+    private void checkoutBranch() {
+
+    }
+
+    public void checkout(String[] args) {
+        // valid argument, different from others
+        if(args.length <= 1 || args.length >= 5) {
+            System.out.println("Incorrect operands.");
+            // exit with 0
+            System.exit(0);
+        }
+
+        // call corresponding helper function
+        if(args.length == 2) {
+            checkoutBranch();
+        } else if (args.length == 3) {
+            checkoutFile(args[2], HEAD);
+        } else {
+            checkoutFile(args[3], args[1]);
+        }
+    }
+
 }
+
+/**
+ * java gitlet.Main init
+ * java gitlet.Main add test.txt
+ * java gitlet.Main commit "no modified"
+ * java gitlet.Main add test.txt
+ * java gitlet.Main commit "modified"
+ * java gitlet.Main log
+ * java gitlet.Main checkout
+ */

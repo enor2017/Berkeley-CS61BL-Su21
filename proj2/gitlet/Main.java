@@ -37,6 +37,10 @@ public class Main {
                 getRepoFromFile();
                 repo.log(args);
                 break;
+            case "checkout":
+                getRepoFromFile();
+                repo.checkout(args);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 return;

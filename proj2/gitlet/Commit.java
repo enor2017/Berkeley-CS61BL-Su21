@@ -36,20 +36,6 @@ public class Commit implements Serializable {
         children = new LinkedList<>();
     }
 
-    /**
-     * helper method:
-     * find a certain hash value in a linked list
-     * @return index in linked list, -1 if doesn't exist
-     */
-    private int findHash(LinkedList<String> ll, String hash) {
-        for(int i = 0; i < ll.size(); ++i) {
-            if(hash.equals(ll.get(i))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     // Constructor: create a commit object based on parent object
     // with given message, current time, and merged blobs linked list.
     public Commit(String parentCommit, String message, LinkedList<String> stage, LinkedList<String> rmStage) {

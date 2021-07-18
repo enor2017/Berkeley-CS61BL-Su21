@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -246,5 +247,18 @@ class Utils {
         return sha1(SerialValue);
     }
 
+    /**
+     * helper method:
+     * find a certain hash value in a linked list
+     * @return index in linked list, -1 if doesn't exist
+     */
+    public static int findHash(LinkedList<String> ll, String hash) {
+        for(int i = 0; i < ll.size(); ++i) {
+            if(hash.equals(ll.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 }
