@@ -1,16 +1,17 @@
 package gitlet;
 
-// TODO: any imports you need here
-
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.Serializable;
+import java.util.Date;
+import java.util.LinkedList;
+import static gitlet.Utils.*;
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author enor2017
  */
-public class Commit {
+public class Commit implements Serializable {
     /**
      * TODO: add instance variables here.
      *
@@ -19,8 +20,20 @@ public class Commit {
      * variable is used. We've provided one example for `message`.
      */
 
-    /** The message of this Commit. */
+    // The message of this Commit.
     private String message;
+    // The time of submitting commit
+    private Date commitTime;
+    // The SHA-1 hash value of parent commit
+    private String parent;
+    // A linkedList to store files in current commit, store blob's hash values
+    private LinkedList<String> hashOfBlobs;
 
-    /* TODO: fill in the rest of this class. */
+    // this constructor only applies to initial commit
+    public Commit () {
+        message = "initial commit";
+        commitTime = new Date(0);
+        parent = null;
+        hashOfBlobs = null;
+    }
 }
