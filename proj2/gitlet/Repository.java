@@ -224,6 +224,7 @@ public class Repository implements Serializable {
         SimpleDateFormat logFormat = new SimpleDateFormat("E MMM d HH:mm:ss yyyy ZZ");
         System.out.println("Date: " + logFormat.format(commitDate));
         System.out.println(commit.getMessage());
+        System.out.println();
     }
 
     public void log(String[] args) {

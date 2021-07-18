@@ -88,7 +88,7 @@ faulty TEST.in files."""
 
 TIMEOUT = 10
 
-JAVA_COMMAND = "java -ea"
+JAVA_COMMAND = "java -Duser.language=en -Duser.timezone=\"PST\" -ea"
 GITLET_CLASS = "gitlet.Main"
 JVM_OPTIONS = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
 

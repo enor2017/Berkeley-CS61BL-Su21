@@ -36,6 +36,7 @@ public class Main {
             case "log":
                 getRepoFromFile();
                 repo.log(args);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 return;

@@ -41,3 +41,5 @@ clean:
 	$(RM) *~
 	$(RMAKE) -C $(PACKAGE) clean
 	$(RMAKE) -C testing clean
+	# delete .gitlet folder, added by @enor2017
+	rm -r .gitlet
