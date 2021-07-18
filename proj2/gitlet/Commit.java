@@ -46,12 +46,12 @@ public class Commit implements Serializable {
 
         // merge parent's blob list and staging area to new commit's blob list
         hashOfBlobs = new LinkedList<>();
-        LinkedList<String> parentCommitBlobs = Repository.findCommit(parentCommit).getHashOfBlobs();
+        LinkedList<String> parentCommitBlobs = findCommit(parentCommit).getHashOfBlobs();
         for(int i = 0; i < parentCommitBlobs.size(); ++i) {
-            String currentHash = parentCommitBlobs.get(i);
-            // if current hash doesn't exist in stage area and rmStage area, add it
-            if(findHash(stage, currentHash) == -1 && findHash(rmStage, currentHash) == -1) {
-                hashOfBlobs.add(currentHash);
+            String currentFileName = findBlob(parentCommitBlobs.get(i)).getFilename();
+            // if current filename doesn't exist in stage area and rmStage area, add it
+            if(findFile(stage, currentFileName) == -1 && findFile(rmStage, currentFileName) == -1) {
+                hashOfBlobs.add(parentCommitBlobs.get(i));
             }
         }
         // add items in stage area to this commit's blob list

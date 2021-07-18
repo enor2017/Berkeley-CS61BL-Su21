@@ -90,36 +90,6 @@ public class Repository implements Serializable {
         writeRepoToFile();
     }
 
-    /**
-     * helper function:
-     * return Commit object given its hash value, return null if cannot find
-     * @param "SHA-1 hash value of a commit"
-     */
-    public static Commit findCommit(String hash) {
-        File toFind = join(COMMIT_DIR, hash);
-        // if file does not exist
-        if(!toFind.exists()) {
-            return null;
-        }
-
-        return readObject(toFind, Commit.class);
-    }
-
-    /**
-     * helper function:
-     * return blob object given its hash value, return null if cannot find
-     * @param "SHA-1 hash value of a blob"
-     */
-    public static Blob findBlob(String hash) {
-        File toFind = join(BLOB_DIR, hash);
-        // if file does not exist
-        if(!toFind.exists()) {
-            return null;
-        }
-
-        return readObject(toFind, Blob.class);
-    }
-
     public void add(String[] args) {
         // valid input
         checkOperand(args, 2);
