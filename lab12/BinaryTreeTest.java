@@ -164,5 +164,32 @@ public class BinaryTreeTest {
                 )
         );
         assertEquals(fib4Ans, fib4);
+
+        BinaryTree<Integer> fib5 = BinaryTree.fibTree(5);
+        BinaryTree<Integer> fib5Ans = new BinaryTree<>(
+                new BinaryTree.TreeNode<>(5,
+                        new BinaryTree.TreeNode<>(3,
+                                new BinaryTree.TreeNode<>(2,
+                                        new BinaryTree.TreeNode<>(1,
+                                                new BinaryTree.TreeNode<>(1, null, null),
+                                                new BinaryTree.TreeNode<>(0, null, null)
+                                        ),
+                                        new BinaryTree.TreeNode<>(1, null, null)
+                                ),
+                                new BinaryTree.TreeNode<>(1,
+                                        new BinaryTree.TreeNode<>(1, null, null),
+                                        new BinaryTree.TreeNode<>(0, null, null)
+                                )
+                        ),
+                        new BinaryTree.TreeNode<>(2,
+                                new BinaryTree.TreeNode<>(1,
+                                        new BinaryTree.TreeNode<>(1, null, null),
+                                        new BinaryTree.TreeNode<>(0, null, null)
+                                ),
+                                new BinaryTree.TreeNode<>(1, null, null)
+                        )
+                )
+        );
+        assertEquals(fib5Ans, fib5);
     }
 }
