@@ -1,7 +1,9 @@
 package gitlet;
 
+import java.awt.geom.Line2D;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import static gitlet.Utils.*;
 
@@ -12,28 +14,73 @@ import static gitlet.Utils.*;
  *  @author enor2017
  */
 public class Commit implements Serializable {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
     // The message of this Commit.
     private String message;
     // The time of submitting commit
     private Date commitTime;
-    // The SHA-1 hash value of parent commit
-    private String parent;
+    // The SHA-1 hash value of parent commit, may have 2nd parent for branch
+    private String parent, secondParent;
     // A linkedList to store files in current commit, store blob's hash values
     private LinkedList<String> hashOfBlobs;
+    // a linkedList to store children, here Commit forms a tree Structure
+    private LinkedList<String> children;
 
     // this constructor only applies to initial commit
     public Commit () {
         message = "initial commit";
         commitTime = new Date(0);
         parent = null;
-        hashOfBlobs = null;
+        secondParent = null;
+        hashOfBlobs = new LinkedList<>();
+        children = new LinkedList<>();
+    }
+
+    /**
+     * helper method:
+     * find a certain hash value in a linked list
+     * @return index in linked list, -1 if doesn't exist
+     */
+    private int findHash(LinkedList<String> ll, String hash) {
+        for(int i = 0; i < ll.size(); ++i) {
+            if(hash.equals(ll.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Constructor: create a commit object based on parent object
+    // with given message, current time, and merged blobs linked list.
+    public Commit(String parentCommit, String message, LinkedList<String> stage, LinkedList<String> rmStage) {
+        this.message = message;
+        this.commitTime = new Date();
+        parent = parentCommit;
+        children = new LinkedList<>();
+
+        // merge parent's blob list and staging area to new commit's blob list
+        hashOfBlobs = new LinkedList<>();
+        LinkedList<String> parentCommitBlobs = Repository.findCommit(parentCommit).getHashOfBlobs();
+        for(int i = 0; i < parentCommitBlobs.size(); ++i) {
+            String currentHash = parentCommitBlobs.get(i);
+            // if current hash doesn't exist in stage area and rmStage area, add it
+            if(findHash(stage, currentHash) == -1 && findHash(rmStage, currentHash) == -1) {
+                hashOfBlobs.add(currentHash);
+            }
+        }
+        // add items in stage area to this commit's blob list
+        for(int i = 0; i < stage.size(); ++i) {
+            hashOfBlobs.add(stage.get(i));
+        }
+    }
+
+    // get blobs of current commit
+    public LinkedList<String> getHashOfBlobs() {
+        return hashOfBlobs;
+    }
+
+    // insert children to current commit
+    public void insertChild(String child) {
+        children.add(child);
     }
 }

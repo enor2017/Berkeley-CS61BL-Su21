@@ -27,7 +27,15 @@ public class Main {
                 break;
             case "add":
                 getRepoFromFile();
+                repo.add(args);
                 break;
+            case "commit":
+                getRepoFromFile();
+                repo.commit(args);
+                break;
+            case "log":
+                getRepoFromFile();
+                repo.log(args);
             default:
                 System.out.println("No command with that name exists.");
                 return;
