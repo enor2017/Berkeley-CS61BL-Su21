@@ -22,8 +22,8 @@ public class Commit implements Serializable {
     private Date commitTime;
     // The SHA-1 hash value of parent commit, may have 2nd parent for branch
     private String parent, secondParent;
-    // A linkedList to store files in current commit, store blob's hash values
-    private LinkedList<String> hashOfBlobs;
+    // A hashMap to store files in current commit, (Blob hash value) -> (Blob fileName)
+    private HashMap<String, String> trackedBlobs;
     // a linkedList to store children, here Commit forms a tree Structure
     private LinkedList<String> children;
 
@@ -33,7 +33,7 @@ public class Commit implements Serializable {
         commitTime = new Date(0);
         parent = null;
         secondParent = null;
-        hashOfBlobs = new LinkedList<>();
+        trackedBlobs = new HashMap<>();
         children = new LinkedList<>();
     }
 
@@ -47,25 +47,26 @@ public class Commit implements Serializable {
         children = new LinkedList<>();
 
         // merge parent's blob list and staging area to new commit's blob list
-        hashOfBlobs = new LinkedList<>();
-        LinkedList<String> parentCommitBlobs = findCommit(parentCommit).getHashOfBlobs();
-        for(int i = 0; i < parentCommitBlobs.size(); ++i) {
-            Blob currentBlob = findBlob(parentCommitBlobs.get(i));
+        trackedBlobs = new HashMap<>();
+        HashMap<String, String> parentCommitBlobs = findCommit(parentCommit).getTrackedBlobs();
+        for(String parentBlobHash : parentCommitBlobs.keySet()) {
+            Blob currentBlob = findBlob(parentBlobHash);
             String currentFileName = currentBlob.getFilename();
             // if current filename doesn't exist in stage area and rmStage area, add it
             if(!stage.containsValue(currentFileName) && !rmStage.containsValue(currentFileName)) {
-                hashOfBlobs.add(parentCommitBlobs.get(i));
+                trackedBlobs.put(parentBlobHash, currentFileName);
             }
         }
         // add items in stage area to this commit's blob list
         for(String toAdd : stage.keySet()) {
-            hashOfBlobs.add(toAdd);
+            Blob currentBlob = findBlob(toAdd);
+            trackedBlobs.put(toAdd, currentBlob.getFilename());
         }
     }
 
     // get blobs of current commit
-    public LinkedList<String> getHashOfBlobs() {
-        return hashOfBlobs;
+    public HashMap<String, String> getTrackedBlobs() {
+        return trackedBlobs;
     }
 
     // insert children to current commit

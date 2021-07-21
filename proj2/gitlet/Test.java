@@ -18,16 +18,17 @@ public class Test {
                 Commit.class);
         Commit mod = readObject(join(Repository.COMMIT_DIR, "a0a9071f21a7ef3500ff47b8b14c642d2fc5a793"),
                 Commit.class);
-        LinkedList<String> noblobs = no.getHashOfBlobs();
-        System.out.println("--- no modified commit: --- ");
-        for(int i = 0; i < noblobs.size(); ++i) {
-            System.out.println(noblobs.get(i));
-        }
-
-        LinkedList<String> modblobs = mod.getHashOfBlobs();
-        System.out.println("--- modified commit: --- ");
-        for(int i = 0; i < modblobs.size(); ++i) {
-            System.out.println(modblobs.get(i));
-        }
+        // Below is an old version of test file: when I use ll rather than hashmap for commit blobs.
+//        LinkedList<String> noblobs = no.getHashOfBlobs();
+//        System.out.println("--- no modified commit: --- ");
+//        for(int i = 0; i < noblobs.size(); ++i) {
+//            System.out.println(noblobs.get(i));
+//        }
+//
+//        LinkedList<String> modblobs = mod.getHashOfBlobs();
+//        System.out.println("--- modified commit: --- ");
+//        for(int i = 0; i < modblobs.size(); ++i) {
+//            System.out.println(modblobs.get(i));
+//        }
     }
 }

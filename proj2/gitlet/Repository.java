@@ -108,13 +108,12 @@ public class Repository implements Serializable {
 
         // scan current commit, if identical,
         // don't add, and remove from staging area if exists
-        LinkedList commitList = findCommit(HEAD).getHashOfBlobs();
-        for(int i = 0; i < commitList.size(); ++i) {
-            String thisBlobHash = (String) commitList.get(i);
+        HashMap<String, String> commitList = findCommit(HEAD).getTrackedBlobs();
+        for(String commitFileHash : commitList.keySet()) {
             // check if identical to given file
-            if(thisBlobHash.equals(newBlobHash)) {
+            if(commitFileHash.equals(newBlobHash)) {
                 // remove from staging area if exists same FILENAME
-                stage.remove(thisBlobHash);
+                stage.remove(commitFileHash);
             }
         }
 
@@ -214,6 +213,20 @@ public class Repository implements Serializable {
         // valid input
         checkOperand(args, 2);
 
+        // Warning: the file may has already been deleted, so cannot make Blob for it
+        String filename = args[1];
+
+        // Unstage the file if it is currently staged.
+
+
+        // If the file is tracked in the current commit,
+        // stage it for removal and remove the file from the working directory
+        HashMap<String, String> trackedBlobs = findCommit(HEAD).getTrackedBlobs();
+
+
+        // no reason to rm the file
+        System.out.println("No reason to remove the file.");
+        return;
     }
 
     /**
@@ -229,16 +242,17 @@ public class Repository implements Serializable {
             System.out.println("No commit with that id exists.");
             return;
         }
-        LinkedList<String> blobs = currentCommit.getHashOfBlobs();
+        HashMap<String, String> trackedBlobs = currentCommit.getTrackedBlobs();
 
-        for(int i = 0; i < blobs.size(); ++i) {
-            Blob thisBlob = findBlob(blobs.get(i));
+        for(String trackedFile : trackedBlobs.keySet()) {
+            Blob thisBlob = findBlob(trackedFile);
             // find in commit blobs? put it in the working directory
             if(thisBlob.getFilename().equals(filename)) {
                 writeContents(join(CWD, filename), thisBlob.getContents());
                 return;
             }
         }
+
         // not found? error message!
         System.out.println("File does not exist in that commit.");
     }
