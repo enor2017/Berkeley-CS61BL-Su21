@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import static gitlet.Utils.*;
@@ -30,10 +31,10 @@ public class Repository implements Serializable {
 
     // The HEAD pointer, stores the hash value of a commit
     private String HEAD = "";
-    // A linkedList to store staging files, each object is a hash value of a Blob
-    private LinkedList<String> stage;
-    // A linkedList to store REMOVED staging files
-    private LinkedList<String> rmStage;
+    // A hashmap to store staging files, (Blob hash value) -> (Blob fileName)
+    private HashMap<String, String> stage;
+    // A hashmap to store REMOVED staging files, (Blob hash value) -> (Blob fileName)
+    private HashMap<String, String> rmStage;
     // A commit tree
     private CommitTree commitTree;
 
@@ -45,8 +46,8 @@ public class Repository implements Serializable {
     // init an empty repo
     public Repository() {
         HEAD = null;
-        stage = new LinkedList<>();
-        rmStage = new LinkedList<>();
+        stage = new HashMap<>();
+        rmStage = new HashMap<>();
         commitTree = new CommitTree();
     }
 
@@ -103,22 +104,17 @@ public class Repository implements Serializable {
 
         // create a blob for the new file for the convenience of check
         Blob newBlob = new Blob(toAdd);
+        String newBlobHash = sha1obj(newBlob);
 
         // scan current commit, if identical,
         // don't add, and remove from staging area if exists
         LinkedList commitList = findCommit(HEAD).getHashOfBlobs();
         for(int i = 0; i < commitList.size(); ++i) {
-            Blob thisBlob = findBlob((String) commitList.get(i));
+            String thisBlobHash = (String) commitList.get(i);
             // check if identical to given file
-            if(thisBlob.equals(newBlob)) {
+            if(thisBlobHash.equals(newBlobHash)) {
                 // remove from staging area if exists same FILENAME
-                for(int j = 0; j < stage.size(); ++j) {
-                    String stageFileName = findBlob(stage.get(j)).getFilename();
-                    if(thisBlob.getFilename().equals(stageFileName)) {
-                        stage.remove(j);
-                    }
-                }
-                return;
+                stage.remove(thisBlobHash);
             }
         }
 
@@ -126,18 +122,19 @@ public class Repository implements Serializable {
         // same filename and same content: return;
         // same filename but diff content: delete original one
         for(int i = 0; i < stage.size(); ++i) {
-            Blob stageBlob = findBlob(stage.get(i));
-            if(newBlob.equals(stageBlob)) {
+            String stageBlobHash = stage.get(i);
+            Blob stageBlob = findBlob(stageBlobHash);
+            if(newBlobHash.equals(stageBlobHash)) {
                 return;
             }
             if(newBlob.getFilename().equals(stageBlob.getFilename())) {
-                stage.remove(i);
+                stage.remove(stageBlobHash);
             }
         }
         // add newFile to staging area
-        stage.add(newBlob.getHashValue());
+        stage.put(newBlobHash, newBlob.getFilename());
         // write blob to file
-        writeObject(join(BLOB_DIR, newBlob.getHashValue()), newBlob);
+        writeObject(join(BLOB_DIR, newBlobHash), newBlob);
 
         // write repo info to the file
         writeRepoToFile();
@@ -174,8 +171,8 @@ public class Repository implements Serializable {
         // Update HEAD
         HEAD = newHash;
         // clear staging area
-        stage = new LinkedList<>();
-        rmStage = new LinkedList<>();
+        stage = new HashMap<>();
+        rmStage = new HashMap<>();
 
         // write repo info to the file
         writeRepoToFile();

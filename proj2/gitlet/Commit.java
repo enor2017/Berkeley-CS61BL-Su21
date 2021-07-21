@@ -3,6 +3,7 @@ package gitlet;
 import java.awt.geom.Line2D;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import static gitlet.Utils.*;
@@ -38,7 +39,8 @@ public class Commit implements Serializable {
 
     // Constructor: create a commit object based on parent object
     // with given message, current time, and merged blobs linked list.
-    public Commit(String parentCommit, String message, LinkedList<String> stage, LinkedList<String> rmStage) {
+    public Commit(String parentCommit, String message, HashMap<String, String> stage,
+                  HashMap<String, String> rmStage) {
         this.message = message;
         this.commitTime = new Date();
         parent = parentCommit;
@@ -48,15 +50,16 @@ public class Commit implements Serializable {
         hashOfBlobs = new LinkedList<>();
         LinkedList<String> parentCommitBlobs = findCommit(parentCommit).getHashOfBlobs();
         for(int i = 0; i < parentCommitBlobs.size(); ++i) {
-            String currentFileName = findBlob(parentCommitBlobs.get(i)).getFilename();
+            Blob currentBlob = findBlob(parentCommitBlobs.get(i));
+            String currentFileName = currentBlob.getFilename();
             // if current filename doesn't exist in stage area and rmStage area, add it
-            if(findFile(stage, currentFileName) == -1 && findFile(rmStage, currentFileName) == -1) {
+            if(!stage.containsValue(currentFileName) && !rmStage.containsValue(currentFileName)) {
                 hashOfBlobs.add(parentCommitBlobs.get(i));
             }
         }
         // add items in stage area to this commit's blob list
-        for(int i = 0; i < stage.size(); ++i) {
-            hashOfBlobs.add(stage.get(i));
+        for(String toAdd : stage.keySet()) {
+            hashOfBlobs.add(toAdd);
         }
     }
 
