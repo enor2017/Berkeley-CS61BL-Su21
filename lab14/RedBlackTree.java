@@ -52,14 +52,14 @@ public class RedBlackTree<T extends Comparable<T>> {
             RBTreeNode<T> rightChild = r.getChildrenCount() > 1 ? buildRedBlackTree(r.getChildAt(1)) : null;
             return new RBTreeNode<>(true, r.getItemAt(0), leftChild, rightChild);
         } else if (r.getItemCount() == 2) {
-            // smaller item becomes black root, larger item becomes right child
-            T smallerItem = r.getItemAt(0);
+            // larger item becomes black root, smaller item becomes left child
             T largerItem = r.getItemAt(1);
-            RBTreeNode<T> leftChild = r.getChildrenCount() > 0 ? buildRedBlackTree(r.getChildAt(0)) : null;
-            RBTreeNode<T> rightChild = new RBTreeNode<>(false, largerItem,
-                    r.getChildrenCount() > 1 ? buildRedBlackTree(r.getChildAt(1)) : null,
-                    r.getChildrenCount() > 2 ? buildRedBlackTree(r.getChildAt(2)) : null);
-            return new RBTreeNode<>(true, smallerItem, leftChild, rightChild);
+            T smallerItem = r.getItemAt(0);
+            RBTreeNode<T> leftChild = new RBTreeNode<>(false, smallerItem,
+                    r.getChildrenCount() > 0 ? buildRedBlackTree(r.getChildAt(0)) : null,
+                    r.getChildrenCount() > 1 ? buildRedBlackTree(r.getChildAt(1)) : null);
+            RBTreeNode<T> rightChild = r.getChildrenCount() > 2 ? buildRedBlackTree(r.getChildAt(2)) : null;
+            return new RBTreeNode<>(true, largerItem, leftChild, rightChild);
         } else {
             // middle item becomes black root, smaller item becomes left child, larger becomes right
             T middleItem = r.getItemAt(1);
