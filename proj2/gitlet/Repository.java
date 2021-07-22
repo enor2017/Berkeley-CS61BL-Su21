@@ -123,16 +123,15 @@ public class Repository implements Serializable {
         // scan staging area, if:
         // same filename and same content: return;
         // same filename but diff content: delete original one
-        for(int i = 0; i < stage.size(); ++i) {
-            String stageBlobHash = stage.get(i);
-            Blob stageBlob = findBlob(stageBlobHash);
+        for(String stageBlobHash : stage.keySet()) {
             if(newBlobHash.equals(stageBlobHash)) {
                 return;
             }
-            if(newBlob.getFilename().equals(stageBlob.getFilename())) {
+            if(newBlob.getFilename().equals(stage.get(stageBlobHash))) {
                 stage.remove(stageBlobHash);
             }
         }
+
         // add newFile to staging area
         stage.put(newBlobHash, newBlob.getFilename());
         // write blob to file
@@ -376,4 +375,7 @@ public class Repository implements Serializable {
  * java gitlet.Main commit "modified"
  * java gitlet.Main log
  * java gitlet.Main checkout
+ * java gitlet.Main global-log
+ * java gitlet.Main status
+ * java gitlet.Main find
  */
