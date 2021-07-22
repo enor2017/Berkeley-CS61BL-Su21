@@ -26,6 +26,8 @@ public class Commit implements Serializable {
     private HashMap<String, String> trackedBlobs;
     // a linkedList to store children, here Commit forms a tree Structure
     private LinkedList<String> children;
+    // a String represent which branch it in
+    private String branch;
 
     // this constructor only applies to initial commit
     public Commit () {
@@ -35,16 +37,18 @@ public class Commit implements Serializable {
         secondParent = null;
         trackedBlobs = new HashMap<>();
         children = new LinkedList<>();
+        branch = "master";
     }
 
     // Constructor: create a commit object based on parent object
     // with given message, current time, and merged blobs linked list.
     public Commit(String parentCommit, String message, HashMap<String, String> stage,
-                  HashMap<String, String> rmStage) {
+                  HashMap<String, String> rmStage, String branch) {
         this.message = message;
         this.commitTime = new Date();
         parent = parentCommit;
         children = new LinkedList<>();
+        this.branch = branch;
 
         // merge parent's blob list and staging area to new commit's blob list
         trackedBlobs = new HashMap<>();
@@ -87,5 +91,10 @@ public class Commit implements Serializable {
     // get commit time
     public Date getCommitTime() {
         return commitTime;
+    }
+
+    // get branch
+    public String getBranch() {
+        return branch;
     }
 }

@@ -29,8 +29,10 @@ public class Repository implements Serializable {
     /** The file for storing repo info */
     public static final File REPO_INFO = join(GITLET_DIR, "repoInfo");
 
-    // The HEAD pointer, stores the hash value of a commit
-    private String HEAD = "";
+    // Each branch should have a HEAD pointer
+    // hashmap: (branch name) -> (HEAD commit hash value)
+    private String currentBranch = "master";
+    private HashMap<String, String> branches;
     // A hashmap to store staging files, (Blob hash value) -> (Blob fileName)
     private HashMap<String, String> stage;
     // A hashmap to store REMOVED staging files, (Blob hash value) -> (Blob fileName)
@@ -45,7 +47,7 @@ public class Repository implements Serializable {
 
     // init an empty repo
     public Repository() {
-        HEAD = null;
+        branches = new HashMap<>();
         stage = new HashMap<>();
         rmStage = new HashMap<>();
         commitTree = new CommitTree();
@@ -85,7 +87,7 @@ public class Repository implements Serializable {
         writeObject(join(COMMIT_DIR, hashVal), firstCommit);
         commitTree = new CommitTree(hashVal);
         // update head
-        HEAD = hashVal;
+        branches.put(currentBranch, hashVal);
 
         // write repo info into file
         writeRepoToFile();
@@ -108,7 +110,7 @@ public class Repository implements Serializable {
 
         // scan current commit, if identical,
         // don't add, and remove from staging area if exists
-        HashMap<String, String> commitList = findCommit(HEAD).getTrackedBlobs();
+        HashMap<String, String> commitList = findCommit(branches.get(currentBranch)).getTrackedBlobs();
         for(String commitFileHash : commitList.keySet()) {
             // check if identical to given file
             if(commitFileHash.equals(newBlobHash)) {
@@ -155,20 +157,21 @@ public class Repository implements Serializable {
         }
 
         // create a new commit
-        Commit newCommit = new Commit(HEAD, args[1], stage, rmStage);
+        String currentHEAD = branches.get(currentBranch);
+        Commit newCommit = new Commit(currentHEAD, args[1], stage, rmStage, currentBranch);
         String newHash = sha1obj(newCommit);
-        // add commit to Commit Tree(just add to parent's child)
-        Commit parentCommit = findCommit(HEAD);
-        parentCommit.insertChild(newHash);
-        // notice that after insert child, parent's hash value changed
-        // we store it to a new file and delete original one
+//        // add commit to Commit Tree(just add to parent's child)
+//        Commit parentCommit = findCommit(currentHEAD);
+//        parentCommit.insertChild(newHash);
+//        // notice that after insert child, parent's hash value changed
+//        // we store it to a new file and delete original one
 //        restrictedDelete(join(COMMIT_DIR, HEAD));
-        String parentNewHash = sha1obj(parentCommit);
+//        String parentNewHash = sha1obj(parentCommit);
         // store commits to file
-        writeObject(join(COMMIT_DIR, parentNewHash), parentCommit);
+//        writeObject(join(COMMIT_DIR, parentNewHash), parentCommit);
         writeObject(join(COMMIT_DIR, newHash), newCommit);
         // Update HEAD
-        HEAD = newHash;
+        branches.replace(currentBranch, newHash);
         // clear staging area
         stage = new HashMap<>();
         rmStage = new HashMap<>();
@@ -201,7 +204,7 @@ public class Repository implements Serializable {
         // valid input
         checkOperand(args, 1);
 
-        Commit p = findCommit(HEAD);
+        Commit p = findCommit(branches.get(currentBranch));
         renderCommit(p);
         while(p.getParent() != null) {
             p = findCommit(p.getParent());
@@ -230,7 +233,7 @@ public class Repository implements Serializable {
 
         // If the file is tracked in the current commit,
         // stage it for removal and remove the file from the working directory
-        HashMap<String, String> trackedBlobs = findCommit(HEAD).getTrackedBlobs();
+        HashMap<String, String> trackedBlobs = findCommit(branches.get(currentBranch)).getTrackedBlobs();
         for(String commitFile : trackedBlobs.keySet()) {
             if(filename.equals(trackedBlobs.get(commitFile))) {
                 rmStage.put(commitFile, trackedBlobs.get(commitFile));
@@ -301,7 +304,7 @@ public class Repository implements Serializable {
         if(args.length == 2) {
             checkoutBranch();
         } else if (args.length == 3) {
-            checkoutFile(args[2], HEAD);
+            checkoutFile(args[2], branches.get(currentBranch));
         } else {
             checkoutFile(args[3], args[1]);
         }
