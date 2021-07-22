@@ -104,7 +104,7 @@ public class RedBlackTree<T extends Comparable<T>> {
         root.isBlack = true;    
     }
 
-    /* Inserts the given node into this Red Black Tree*/
+    /* Inserts the given item into this given Red Black Tree */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
         // Insert (return) new red leaf node.
         if (node == null) {
@@ -122,15 +122,27 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         // handle case C and "Right-leaning" situation.
-        
+        // leaning right
+        // make good use of isRed, it returns black for null node
+        if(!isRed(node.left) && isRed(node.right)) {
+            node = rotateLeft(node);
+        }
 
         // handle case B
-        
+        // double left red
+        // if (node.left) is null, first condition breaks, won't call (node.left.left)
+        if(isRed(node.left) && isRed(node.left.left)) {
+            node = rotateRight(node);
+        }
 
         // handle case A
-        
-        // TODO: YOUR CODE HERE
-        return null; //fix this return statement
+        // two red children
+        // flipColors(node) will flip the color of node and its children
+        if(isRed(node.left) && isRed(node.right)) {
+            flipColors(node);
+        }
+
+        return node;
     }
 
     /* Returns whether the given node NODE is red. Null nodes (children of leaf
