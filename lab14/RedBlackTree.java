@@ -47,13 +47,13 @@ public class RedBlackTree<T extends Comparable<T>> {
 
         if (r.getItemCount() == 1) {
             // TODO: Replace with code to create a 2 node equivalent
-            return null
+            return null;
         } else if (r.getItemCount() == 2) {
             // TODO: Replace with code to create a 3 node equivalent
-            return null
+            return null;
         } else {
             // TODO: Replace with code to create a 4 node equivalent
-            return null
+            return null;
         }
     }
 
