@@ -215,18 +215,40 @@ public class Repository implements Serializable {
 
         // Warning: the file may has already been deleted, so cannot make Blob for it
         String filename = args[1];
+        // record whether we have a reason to remove the file
+        boolean validRemove = false;
 
         // Unstage the file if it is currently staged.
-
+        for(String stagedFile : stage.keySet()) {
+            if(filename.equals(stage.get(stagedFile))) {
+                stage.remove(stagedFile);
+                validRemove = true;
+                // cannot have two files with same name, so we just break
+                break;
+            }
+        }
 
         // If the file is tracked in the current commit,
         // stage it for removal and remove the file from the working directory
         HashMap<String, String> trackedBlobs = findCommit(HEAD).getTrackedBlobs();
+        for(String commitFile : trackedBlobs.keySet()) {
+            if(filename.equals(trackedBlobs.get(commitFile))) {
+                rmStage.put(commitFile, trackedBlobs.get(commitFile));
+                // remove the file from the working directory
+                Utils.restrictedDelete(join(CWD, filename));
+                validRemove = true;
+                // cannot have two files with same name, so we just break
+                break;
+            }
+        }
 
-
-        // no reason to rm the file
-        System.out.println("No reason to remove the file.");
-        return;
+        if(validRemove) {
+            // write repo info to the file
+            writeRepoToFile();
+        } else {
+            // no reason to rm the file
+            System.out.println("No reason to remove the file.");
+        }
     }
 
     /**

@@ -248,21 +248,6 @@ class Utils {
     }
 
     /**
-     * helper method:
-     * find a certain filename in a linked list (for Blob only)
-     * @return index in linked list, -1 if doesn't exist
-     */
-    public static int findFile(LinkedList<String> ll, String filename) {
-        for(int i = 0; i < ll.size(); ++i) {
-            String currentFilename = findBlob(ll.get(i)).getFilename();
-            if(filename.equals(currentFilename)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
      * helper function:
      * return Commit object given its hash value, return null if cannot find
      * @param "SHA-1 hash value of a commit"
