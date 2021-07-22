@@ -41,6 +41,22 @@ public class Main {
                 getRepoFromFile();
                 repo.checkout(args);
                 break;
+            case "branch":
+                getRepoFromFile();;
+                repo.branch(args);
+                break;
+            case "global-log":
+                getRepoFromFile();;
+                repo.globalLog(args);
+                break;
+            case "find":
+                getRepoFromFile();;
+                repo.find(args);
+                break;
+            case "status":
+                getRepoFromFile();;
+                repo.status(args);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 return;

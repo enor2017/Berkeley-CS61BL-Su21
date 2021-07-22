@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import static gitlet.Utils.*;
 
@@ -308,6 +309,61 @@ public class Repository implements Serializable {
         } else {
             checkoutFile(args[3], args[1]);
         }
+    }
+
+    public void globalLog(String[] args) {
+        // valid arguments
+        checkOperand(args, 1);
+        // get all commit files
+        List<String> commitFileNames = plainFilenamesIn(COMMIT_DIR);
+        // print all commits in log style
+        for(String commit : commitFileNames) {
+            Commit currentCommit = findCommit(commit);
+            renderCommit(currentCommit);
+        }
+    }
+
+    public void find(String[] args) {
+        // valid arguments
+        checkOperand(args, 2);
+        // commit message that looking for
+        String message = args[1];
+        // get all commit files
+        List<String> commitFileNames = plainFilenamesIn(COMMIT_DIR);
+        // if any commit found, set to true
+        boolean foundAny = false;
+        // search all commits
+        for(String commit : commitFileNames) {
+            Commit currentCommit = findCommit(commit);
+            if(message.equals(currentCommit.getMessage())) {
+                System.out.println(commit);
+                foundAny = true;
+            }
+        }
+        // if nothing found?
+        if(!foundAny) {
+            System.out.println("Found no commit with that message.");
+        }
+    }
+
+    public void status(String[] args) {
+
+    }
+
+    public void branch(String[] args) {
+        // valid argument
+        checkOperand(args, 2);
+
+        String newBranch = args[1];
+        // if already exists that branch
+        if(branches.containsKey(newBranch)) {
+            System.out.println("A branch with that name already exists.");
+            return;
+        }
+        // create a new branch and make a HEAD pointer, pointing at current HEAD
+        branches.put(newBranch, branches.get(currentBranch));
+        // write repo info to the file
+        writeRepoToFile();
     }
 
 }
