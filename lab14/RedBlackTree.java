@@ -46,14 +46,30 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         if (r.getItemCount() == 1) {
-            // TODO: Replace with code to create a 2 node equivalent
-            return null;
+            // becomes a single black node
+            // we need to recursively build two children
+            RBTreeNode<T> leftChild = r.getChildrenCount() > 0 ? buildRedBlackTree(r.getChildAt(0)) : null;
+            RBTreeNode<T> rightChild = r.getChildrenCount() > 1 ? buildRedBlackTree(r.getChildAt(1)) : null;
+            return new RBTreeNode<>(true, r.getItemAt(0), leftChild, rightChild);
         } else if (r.getItemCount() == 2) {
-            // TODO: Replace with code to create a 3 node equivalent
-            return null;
+            // smaller item becomes black root, larger item becomes right child
+            T smallerItem = r.getItemAt(0);
+            T largerItem = r.getItemAt(1);
+            RBTreeNode<T> leftChild = r.getChildrenCount() > 0 ? buildRedBlackTree(r.getChildAt(0)) : null;
+            RBTreeNode<T> rightChild = new RBTreeNode<>(false, largerItem,
+                    r.getChildrenCount() > 1 ? buildRedBlackTree(r.getChildAt(1)) : null,
+                    r.getChildrenCount() > 2 ? buildRedBlackTree(r.getChildAt(2)) : null);
+            return new RBTreeNode<>(true, smallerItem, leftChild, rightChild);
         } else {
-            // TODO: Replace with code to create a 4 node equivalent
-            return null;
+            // middle item becomes black root, smaller item becomes left child, larger becomes right
+            T middleItem = r.getItemAt(1);
+            RBTreeNode<T> leftChild = new RBTreeNode<>(false, r.getItemAt(0),
+                    r.getChildrenCount() > 0 ? buildRedBlackTree(r.getChildAt(0)) : null,
+                    r.getChildrenCount() > 1 ? buildRedBlackTree(r.getChildAt(1)) : null);
+            RBTreeNode<T> rightChild = new RBTreeNode<>(false, r.getItemAt(2),
+                    r.getChildrenCount() > 2 ? buildRedBlackTree(r.getChildAt(2)) : null,
+                    r.getChildrenCount() > 3 ? buildRedBlackTree(r.getChildAt(3)) : null);
+            return new RBTreeNode<>(true, middleItem, leftChild, rightChild);
         }
     }
 
@@ -68,15 +84,19 @@ public class RedBlackTree<T extends Comparable<T>> {
     /* Rotates the given node NODE to the right. Returns the new root node of
        this subtree. */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> leftChild = node.left;
+        node.left = leftChild.right;
+        leftChild.right = node;
+        return leftChild;
     }
 
     /* Rotates the given node NODE to the left. Returns the new root node of
        this subtree. */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> rightChild = node.right;
+        node.right = rightChild.left;
+        rightChild.left = node;
+        return rightChild;
     }
 
     public void insert(T item) {   

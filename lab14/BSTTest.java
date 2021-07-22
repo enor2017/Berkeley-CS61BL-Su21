@@ -23,6 +23,6 @@ public class BSTTest {
         list.add(8);
         bst = new BST<>(list);
         bst.print();
-        System.out.println("====\nCorrect if print: \n5\n  3\n    2\n      1\n    4\n  7\n    6\n    8\n===\n");
+        System.out.println("====\nCorrect if print: \n5\n  3\n    2\n      1\n    4\n  7\n    6\n    8\nNotice: There can be different stuctures that also correct.\n===\n");
     }
 }
