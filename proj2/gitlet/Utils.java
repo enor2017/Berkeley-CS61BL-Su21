@@ -250,16 +250,35 @@ class Utils {
     /**
      * helper function:
      * return Commit object given its hash value, return null if cannot find
-     * @param "SHA-1 hash value of a commit"
+     * Here abbreviate id is allowed, but if more than one commits are found,
+     * throw exception
+     * @param "SHA-1 hash value(or abbreviate id) of a commit"
      */
     public static Commit findCommit(String hash) {
-        File toFind = join(Repository.COMMIT_DIR, hash);
-        // if file does not exist
-        if(!toFind.exists()) {
-            return null;
+        if(hash.length() < 40) {
+            File toFind = join(Repository.COMMIT_DIR, hash);
+            // if file does not exist
+            if(!toFind.exists()) {
+                return null;
+            }
+            return readObject(toFind, Commit.class);
+        } else {
+            // abbreviate id given
+            Commit commitFound = null;
+            List<String> commitsList = plainFilenamesIn(Repository.COMMIT_DIR);
+            for(String commitID : commitsList) {
+                String substrID = commitID.substring(0, hash.length());
+                if(substrID.equals(hash)) {
+                    // if not found before, OK, else, exception
+                    if(commitFound == null) {
+                        commitFound = readObject(join(Repository.COMMIT_DIR, commitID), Commit.class);
+                    } else {
+                        throw new IllegalArgumentException("More than one commits found.");
+                    }
+                }
+            }
+            return commitFound;
         }
-
-        return readObject(toFind, Commit.class);
     }
 
     /**
