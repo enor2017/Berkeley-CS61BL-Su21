@@ -1,0 +1,46 @@
+# A simple test for 'find [commit message]', with branch
+I definitions.inc
+I simpleSetup.inc
+I simpleBranch.inc
+> log
+===
+${COMMIT_HEAD}
+${DATE}
+upload word v2 to secondBranch
+
+===
+${COMMIT_HEAD}
+${DATE}
+change sentence
+
+===
+${COMMIT_HEAD}
+${DATE}
+added sentence
+
+===
+${COMMIT_HEAD}
+${DATE}
+initial commit
+
+<<<*
+> find "haha"
+Found no commit with that message.
+<<<
+# define some commit ids
+D UID4 "${1}"
+D UID3 "${2}"
+D UID2 "${3}"
+D UID1 "${4}"
+> find "initial commit"
+${UID1}
+<<<*
+> find "added sentence"
+${UID2}
+<<<*
+> find "change sentence"
+${UID3}
+<<<*
+> find "upload word v2 to secondBranch"
+${UID4}
+<<<*

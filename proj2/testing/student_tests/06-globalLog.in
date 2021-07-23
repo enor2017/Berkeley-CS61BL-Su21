@@ -1,0 +1,32 @@
+# A really simple test for 'global-log', with branch
+I definitions.inc
+I simpleSetup.inc
+I simpleBranch.inc
+# should be 5 commits in total
+> global-log
+===
+${COMMIT_HEAD}
+${DATE}
+${ARBLINE}
+
+===
+${COMMIT_HEAD}
+${DATE}
+${ARBLINE}
+
+===
+${COMMIT_HEAD}
+${DATE}
+${ARBLINE}
+
+===
+${COMMIT_HEAD}
+${DATE}
+${ARBLINE}
+
+===
+${COMMIT_HEAD}
+${DATE}
+${ARBLINE}
+
+<<<*

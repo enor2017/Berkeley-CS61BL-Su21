@@ -1,0 +1,25 @@
+# A simple test for 'branch [branch]' and 'checkout [branch]'
+I definitions.inc
+I simpleSetup.inc
+> branch master
+A branch with that name already exists.
+<<<
+> branch secondBranch
+<<<
+> branch master
+A branch with that name already exists.
+<<<
+> branch secondBranch
+A branch with that name already exists.
+<<<
+> checkout master
+No need to checkout the current branch.
+<<<
+> checkout lalala
+No such branch exists.
+<<<
+> checkout secondBranch
+<<<
+> checkout secondBranch
+No need to checkout the current branch.
+<<<
