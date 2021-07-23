@@ -87,6 +87,9 @@ public class RedBlackTree<T extends Comparable<T>> {
         RBTreeNode<T> leftChild = node.left;
         node.left = leftChild.right;
         leftChild.right = node;
+        // make the new root have the color of old root, color old root red
+        leftChild.isBlack = leftChild.right.isBlack;
+        leftChild.right.isBlack = false;
         return leftChild;
     }
 
@@ -96,6 +99,8 @@ public class RedBlackTree<T extends Comparable<T>> {
         RBTreeNode<T> rightChild = node.right;
         node.right = rightChild.left;
         rightChild.left = node;
+        rightChild.isBlack = rightChild.left.isBlack;
+        rightChild.left.isBlack = false;
         return rightChild;
     }
 
