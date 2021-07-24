@@ -1,0 +1,123 @@
+# this test strictly follows what quiz does.
+# 'Modifications Not Staged For Commit' and 'Untracked Files' are not tested.
+I definitions.inc
+> init
+<<<
++ hello.txt hello.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
+> add hello.txt
+<<<
++ game.txt game.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+hello.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
+> commit "hello!"
+<<<
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
++ hello.txt hellomod.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
+> add game.txt
+<<<
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+game.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
+> checkout -- hello.txt
+<<<
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+game.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
++ game.txt gamemod.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+game.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
+> rm game.txt
+<<<
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
+- hello.txt
+> status
+=== Branches ===
+\*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+${ARBLINES}
+<<<*
