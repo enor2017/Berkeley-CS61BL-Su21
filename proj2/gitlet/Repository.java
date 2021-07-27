@@ -6,14 +6,11 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static gitlet.Utils.*;
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
  *
  *  @author enor2017
  */
@@ -34,10 +31,7 @@ public class Repository implements Serializable {
     // hashmap: (branch name) -> (HEAD commit hash value)
     private String currentBranch = "master";
     private HashMap<String, String> branches;
-    // A hashmap to store staging files, (Blob hash value) -> (Blob fileName)
-    private HashMap<String, String> stage;
-    // A hashmap to store REMOVED staging files, (Blob hash value) -> (Blob fileName)
-    private HashMap<String, String> rmStage;
+
     // A commit tree
     private CommitTree commitTree;
 
