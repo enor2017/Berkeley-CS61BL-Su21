@@ -1,41 +1,62 @@
 public class SimpleNameMap {
 
-    /* TODO: Instance variables here */
+    private Entry[] items;
+    private int size;
 
     public SimpleNameMap() {
-        // TODO: YOUR CODE HERE
+        items = new Entry[26];
+        size = 0;
+    }
+
+    /* helper function: return the simple hashcode for string */
+    private static int myHash(String word) {
+        if(word == null || word.length() < 1) {
+            return 0;
+        } else {
+            return word.charAt(0) - 'A';
+        }
     }
 
     /* Returns the number of items contained in this map. */
     public int size() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        return size;
     }
 
     /* Returns true if the map contains the KEY. */
     public boolean containsKey(String key) {
-        // TODO: YOUR CODE HERE
-        return false;
+        return items[myHash(key)] != null;
     }
 
     /* Returns the value for the specified KEY. If KEY is not found, return
        null. */
     public String get(String key) {
-        // TODO: YOUR CODE HERE
-        return null;
+        if(!containsKey(key)) {
+            return null;
+        } else {
+            return items[myHash(key)].value;
+        }
     }
 
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
        SimpleNameMap, replace the current corresponding value with VALUE. */
     public void put(String key, String value) {
-        // TODO: YOUR CODE HERE
+        if(!containsKey(key)) {
+            size++;
+        }
+        items[myHash(key)] = new Entry(key, value);
     }
 
     /* Removes a single entry, KEY, from this table and return the VALUE if
        successful or NULL otherwise. */
     public String remove(String key) {
-        // TODO: YOUR CODE HERE
-        return null;
+        if(!containsKey(key)) {
+            return null;
+        } else {
+            String value = items[myHash(key)].value;
+            items[myHash(key)] = null;
+            size--;
+            return value;
+        }
     }
 
     private static class Entry {
