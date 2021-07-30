@@ -1,3 +1,5 @@
+import java.util.NoSuchElementException;
+
 /* A PriorityQueue class that uses a min heap to maintain ordering. */
 public class MinHeapPQ<T> implements PriorityQueue<T> {
 
@@ -12,34 +14,44 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
     /* Returns the item with the smallest priority value, but does not remove it
        from the MinHeapPQ. */
     public T peek() {
-        // TODO: YOUR CODE HERE
-        return null;
+        PriorityItem minItem = heap.findMin();
+        if(minItem == null) {
+            return null;
+        } else {
+            return minItem.item;
+        }
     }
 
     /* Inserts ITEM with the priority value PRIORITYVALUE into the MinHeapPQ. If
        ITEM is already in the MinHeapPQ, throw an IllegalArgumentException. */
     public void insert(T item, double priorityValue) {
-        // TODO: YOUR CODE HERE
+        heap.insert(new PriorityItem(item, priorityValue));
     }
 
     /* Returns the item with the highest priority (smallest priority value), and
        removes it from the MinHeapPQ. */
     public T poll() {
-        // TODO: YOUR CODE HERE
-        return null;
+        PriorityItem minItem = heap.removeMin();
+        if(minItem == null) {
+            return null;
+        } else {
+            return minItem.item;
+        }
     }
 
     /* Changes the PriorityItem with item ITEM to have priority value
        PRIORITYVALUE. Assume the items in the MinHeapPQ are all unique. If ITEM
        is not in the MinHeapPQ, throw a NoSuchElementException. */
     public void changePriority(T item, double priorityValue) {
-        // TODO: YOUR CODE HERE
+        if(!contains(item)) {
+            throw new NoSuchElementException();
+        }
+        heap.update(new PriorityItem(item, priorityValue));
     }
 
     /* Returns the number of items in the MinHeapPQ. */
     public int size() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        return heap.size();
     }
 
     /* Returns true if ITEM is stored in our MinHeapPQ. Note: Any priority value
