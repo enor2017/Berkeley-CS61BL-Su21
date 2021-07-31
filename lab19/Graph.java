@@ -246,22 +246,42 @@ public class Graph implements Iterable<Integer> {
     private class TopologicalIterator implements Iterator<Integer> {
 
         private Stack<Integer> fringe;
-
-        // TODO: Instance variables here!
+        private int[] inDegree;
+        private boolean[] visited;
 
         TopologicalIterator() {
             fringe = new Stack<Integer>();
-            // TODO: YOUR CODE HERE
+            inDegree = new int[vertexCount];
+            visited = new boolean[vertexCount];
+            for(int i = 0; i < vertexCount; ++i) {
+                inDegree[i] = inDegree(i);
+                // if in-deg is 0, push and visited
+                if(inDegree[i] == 0) {
+                    fringe.push(i);
+                    visited[i] = true;
+                }
+            }
         }
 
         public boolean hasNext() {
-            // TODO: YOUR CODE HERE
-            return false;
+            return !fringe.isEmpty();
         }
 
         public Integer next() {
-            // TODO: YOUR CODE HERE
-            return 0;
+            int toReturn = fringe.pop();
+            List<Integer> neighbours = neighbors(toReturn);
+            for(int v : neighbours) {
+                // minus 1 for neighbor whose in-deg is not 0
+                if(inDegree[v] != 0) {
+                    inDegree[v]--;
+                    // if -1 cause in-deg = 0, push into fringe
+                    if(inDegree[v] == 0) {
+                        fringe.push(v);
+                        visited[v] = true;
+                    }
+                }
+            }
+            return toReturn;
         }
 
         public void remove() {
@@ -375,22 +395,22 @@ public class Graph implements Iterable<Integer> {
     }
 
     public static void main(String[] args) {
-//        Graph g1 = new Graph(5);
-//        g1.generateG1();
-//        g1.printDFS(0);
-//        g1.printDFS(2);
-//        g1.printDFS(3);
-//        g1.printDFS(4);
-//
-//        g1.printPath(0, 3);
-//        g1.printPath(0, 4);
-//        g1.printPath(1, 3);
-//        g1.printPath(1, 4);
-//        g1.printPath(4, 0);
-//
-//        Graph g2 = new Graph(5);
-//        g2.generateG2();
-//        g2.printTopologicalSort();
+        Graph g1 = new Graph(5);
+        g1.generateG1();
+        g1.printDFS(0);
+        g1.printDFS(2);
+        g1.printDFS(3);
+        g1.printDFS(4);
+
+        g1.printPath(0, 3);
+        g1.printPath(0, 4);
+        g1.printPath(1, 3);
+        g1.printPath(1, 4);
+        g1.printPath(4, 0);
+
+        Graph g2 = new Graph(5);
+        g2.generateG2();
+        g2.printTopologicalSort();
 
         System.out.println("===== My Tests =====");
         Graph g3 = new Graph(11);
