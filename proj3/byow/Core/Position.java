@@ -60,4 +60,13 @@ public class Position {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o.getClass() != Position.class) {
+            return false;
+        }
+        Position pos = (Position) o;
+        return (x == pos.x) && (y == pos.y);
+    }
 }

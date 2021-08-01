@@ -33,7 +33,7 @@ public class WorldGenerator {
     /* the width and height of map, make sure it's odd */
     private int width, height;
     /* a factor deciding winding percent of maze, used while generating perfect maze */
-    private final double WINDING_PERCENT = 1.0;
+    private final double WINDING_PERCENT = 0.4;
     /* the Random object for generating random numbers */
     private Random rand;
     /* Four directions while generating maze */
@@ -118,17 +118,15 @@ public class WorldGenerator {
             }
 
             // otherwise, choose whether or not to keep original direction
+            // keep if rand > WINDING_PERCENT, and last direction is valid
             Position dire;
-            if(RandomUtils.uniform(rand) < WINDING_PERCENT) {
+            if(RandomUtils.uniform(rand) > WINDING_PERCENT && contains(legalDirections, lastDirection)) {
+                dire = lastDirection;
+            } else {
                 dire = legalDirections.get(RandomUtils.uniform(rand, legalDirections.size()));
                 lastDirection = dire;
-            } else {
-                //TODO: bug: sometimes last direction not valid
-                dire = lastDirection;
             }
             // make path
-            // System.out.println("current: " + currentCell);
-            // System.out.println("dire: " + dire);
             carveCell(currentCell.add(dire), areaNum);
             carveCell(currentCell.add(dire, 2), areaNum);
             // add newly carved cell to fringe
@@ -186,6 +184,21 @@ public class WorldGenerator {
             }
         }
         return carvedCells;
+    }
+
+    /**
+     * Used in generating maze, check whether last direction in valid directions
+     * @param list given list
+     * @param dire direction
+     * @return true if direction in given list
+     */
+    private boolean contains(LinkedList<Position> list, Position dire) {
+        for(Position pos : list) {
+            if(dire.equals(pos)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
