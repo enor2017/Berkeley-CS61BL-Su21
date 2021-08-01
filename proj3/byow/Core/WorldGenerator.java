@@ -147,10 +147,6 @@ public class WorldGenerator {
             // make sure:
             // 1. destination must not open to other area (map[x+2dx][y+2dy] not occupied)
             // 2. destination must end in bounds (map[x+3dx][y+3dy] in bound)
-            Position onceDeltaPos = pos.add(dire);
-            if(!isWall(onceDeltaPos)) {
-                continue;
-            }
             Position doubleDeltaPos = pos.add(dire, 2);
             if(!isWall(doubleDeltaPos)) {
                 continue;
