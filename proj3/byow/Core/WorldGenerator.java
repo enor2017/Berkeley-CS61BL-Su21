@@ -12,8 +12,7 @@ import java.util.Stack;
  * This is the class for generating a world, with steps below:
  * 1. generate a perfect maze, using dfs
  * 2. spareness: destroy some dead-ends on perfect maze by making them to wall
- * 3. connection: destroy some dead-ends but by connecting it to another corridor
- * 4. place room: make sure room overlaps with some rooms/corridors but not to many
+ * 3. place room: make sure room overlaps with some rooms/corridors but not to many
  *
  * The width/height of world must be odd, and coordinates we place rooms/corridors
  * must be odd, to leave place for walls. (make it aligned)
@@ -23,12 +22,13 @@ import java.util.Stack;
  *
  * The thought is basically the same as the 1st source but have some simplification
  * while placing the room. The 2nd source provides the idea that make world/coordinates
- * odd to leave place for walls.
+ * odd to leave place for walls, as well as the excellent winding factor idea.
  */
 public class WorldGenerator {
-    /* a counter for the number of areas, area # starts from 0 */
+    /* a counter for the number of areas, area # starts from 0
+      Actually corridors are labelled as 0, while rooms are labelled from 1. */
     private int areaNum = -1;
-    /* the map used when generating the world, -1 for wall, others for area */
+    /* the map used when generating the world, -2 for nothing, -1 for wall, others for area */
     private int[][] map;
     /* the width and height of map, make sure it's odd */
     private int width, height;
@@ -41,6 +41,10 @@ public class WorldGenerator {
                                     new Position(0, 1), new Position(0, -1)};
     /* How many times will we perform spareness */
     private final int SPARE_FACTOR = 240;
+    /* randomly choose how many rooms will we place */
+    private int roomNum;
+    /* max cell toleration can a room overlap with previous objects */
+    private final int MAX_OVERLAP = 18;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -66,6 +70,8 @@ public class WorldGenerator {
         // TODO: need a hash converter, convert int to long causes collision.
         Long seed = (long) randomSeed.hashCode();
         this.rand = new Random(seed);
+        // choose how many rooms to generate: [10, 15)
+        roomNum = RandomUtils.uniform(rand, 10, 15);
     }
 
     /**
@@ -209,8 +215,11 @@ public class WorldGenerator {
     /* ========================================================= */
     /* ===============  Part II: Spare Dead-End  =============== */
     /* ========================================================= */
+    /**
+     * perform spareness to delete some dead-ends
+     * delete exactly SPARE_FACTOR cells.
+     */
     private void spareness() {
-        // we perform exactly SPARE_FACTOR times of spareness
         int spareCount = 0;
         while(true) {
             for(int i = 0; i < width; ++i) {
@@ -250,6 +259,130 @@ public class WorldGenerator {
         return countSurrounding == 3;
     }
 
+    /* ======================================================= */
+    /* ===============  Part III: Place Rooms  =============== */
+    /* ======================================================= */
+    /**
+     * place ROOM_NUM rooms on the board, follow the algorithm:
+     * 1. generate a rectangle that is not too thin/tall
+     * 2. randomly choose locations on the board, find somewhere that
+     *  (1) has overlap with previous rooms/corridors
+     *  (2) but not overlap too much
+     */
+    private void placeRooms() {
+        // add a loop time limit, to avoid infinite loop
+        int loopTime = 0;
+        for(int roomCount = 0; roomCount < roomNum && loopTime <= 1000; ++roomCount, ++loopTime) {
+            // randomly generate a room size (not too thin/tall)
+            // (1) start from a square with ODD size
+            // (2) add either width or height an even length
+            int squareLength = RandomUtils.uniform(rand, 1, 3) * 2 + 1;
+            int deltaLength = RandomUtils.uniform(rand, 0, 1 + squareLength / 2) * 2;
+            int roomWidth = squareLength;
+            int roomHeight = squareLength;
+            if(RandomUtils.uniform(rand) < 0.5) {
+                roomWidth += deltaLength;
+            } else {
+                roomHeight += deltaLength;
+            }
+
+            // randomly choose a cell to put room's bottomLeft corner
+            // the cell must have ODD coordinates
+            // if 1 <= overlap <= MAX_OVERLAP, carve it in the map
+            while(true) {
+                int roomX = RandomUtils.uniform(rand, (width - roomWidth) / 2 - 1) * 2 + 1;
+                int roomY = RandomUtils.uniform(rand, (height - roomHeight) / 2 - 1) * 2 + 1;
+                Position bottomLeftPos = new Position(roomX, roomY);
+                int overlapCnt = overlapCount(bottomLeftPos, roomWidth, roomHeight);
+                if(overlapCnt >= 1 && overlapCnt <= MAX_OVERLAP) {
+                    // don't forget to setup a new area
+                    ++areaNum;
+                    carveRoom(bottomLeftPos, roomWidth, roomHeight, areaNum);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * count how many cells does the given room overlap with previous objects
+     * @param bottomLeft the bottom-left coordinate of given room
+     * @param width room width
+     * @param height room height
+     * @return num of cells overlapped
+     */
+    private int overlapCount(Position bottomLeft, int width, int height) {
+        int count = 0;
+        for(int dx = 0; dx < width; ++dx) {
+            for(int dy = 0; dy < height; ++dy) {
+                Position delta = new Position(dx, dy);
+                Position newPos = bottomLeft.add(delta);
+                // if the position is not wall, which means it's occupied
+                // counter += 1
+                if(!isWall(newPos)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * carve the given room on the map we generated, with a new areaIndex
+     * @param bottomLeft the bottom-left coordinate of given room
+     * @param width room width
+     * @param height room height
+     * @param areaIndex area index of the room to carve on map
+     */
+    private void carveRoom(Position bottomLeft, int width, int height, int areaIndex) {
+        for(int dx = 0; dx < width; ++dx) {
+            for(int dy = 0; dy < height; ++dy) {
+                Position delta = new Position(dx, dy);
+                Position newPos = bottomLeft.add(delta);
+                carveCell(newPos, areaIndex);
+            }
+        }
+    }
+
+    /* =================================================================== */
+    /* ===============  Part IV: Remove unnecessary walls  =============== */
+    /* =================================================================== */
+
+    /**
+     * Remove unnecessary walls in the map
+     * for the sake of simplicity, remove walls who has four wall neighbours
+     */
+    private void removeUnnecessaryWalls() {
+        // TODO: this function performs so bad that I remove it. Waiting for some better ideas
+        return;
+//        // store positions that are to removed
+//        Stack<Position> toRemove = new Stack<>();
+//
+//        for(int i = 0; i < width; ++i) {
+//            for(int j = 0; j < height; ++j) {
+//                Position pos = new Position(i, j);
+//                // loop four directions
+//                int countWallNeighbours = 0;
+//                for(Position dire : directions) {
+//                    Position neighbour = pos.add(dire);
+//                    if(checkPositionInBound(neighbour) && isWall(neighbour)) {
+//                        countWallNeighbours++;
+//                    }
+//                }
+//                // uncarve the cell iff has four wall neighbours
+//                // notice that we cannot flag those cells on original map!
+//                if(countWallNeighbours == 4) {
+//                    toRemove.add(pos);
+//                }
+//            }
+//        }
+//
+//        // here we pop cells and mark on original map
+//        while(!toRemove.isEmpty()) {
+//            Position pos = toRemove.pop();
+//            map[pos.getX()][pos.getY()] = -2;
+//        }
+    }
 
     /* ================================================ */
     /* ===============  Test Functions  =============== */
@@ -263,11 +396,17 @@ public class WorldGenerator {
         System.out.println("Maze successfully generated.");
         spareness();
         System.out.println("Maze successfully spared.");
+        placeRooms();
+        System.out.println("Room successfully generated.");
+        removeUnnecessaryWalls();
+        System.out.println("Unnecessary Walls successfully removed.");
 
         TETile[][] tiles = new TETile[width][height];
         for(int i = 0; i < width; ++i) {
             for(int j = 0; j < height; ++j) {
-                if(map[i][j] == -1) {
+                if(map[i][j] == -2) {
+                    tiles[i][j] = Tileset.NOTHING;
+                } else if(map[i][j] == -1) {
                     tiles[i][j] = Tileset.WALL;
                 } else {
                     tiles[i][j] = Tileset.FLOOR;
