@@ -39,6 +39,8 @@ public class WorldGenerator {
     /* Four directions while generating maze */
     private Position[] directions = {new Position(1, 0), new Position(-1, 0),
                                     new Position(0, 1), new Position(0, -1)};
+    /* How many times will we perform spareness */
+    private final int SPARE_FACTOR = 240;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -84,6 +86,9 @@ public class WorldGenerator {
         map[pos.getX()][pos.getY()] = areaIndex;
     }
 
+    /* ======================================================== */
+    /* ===============  Part I: Maze Generator  =============== */
+    /* ======================================================== */
     private void growMaze(Position start) {
         Stack<Position> fringe = new Stack<>();
 
@@ -201,6 +206,54 @@ public class WorldGenerator {
         return false;
     }
 
+    /* ========================================================= */
+    /* ===============  Part II: Spare Dead-End  =============== */
+    /* ========================================================= */
+    private void spareness() {
+        // we perform exactly SPARE_FACTOR times of spareness
+        int spareCount = 0;
+        while(true) {
+            for(int i = 0; i < width; ++i) {
+                for(int j = 0; j < height; ++j) {
+                    Position currentPos = new Position(i, j);
+                    // if this is dead end, carve back to wall
+                    if(isDeadEnd(currentPos)) {
+                        carveCell(currentPos, -1);
+                        spareCount++;
+                    }
+                    // if reach spare limit, terminate
+                    if(spareCount == SPARE_FACTOR) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * helper function: check if given pos is a dead-end
+     * @param pos the pos to check
+     * @return true if given pos is a dead-end
+     */
+    private boolean isDeadEnd(Position pos) {
+        // pos is dead-end iff itself is not wall, and it's surrounded by three walls
+        if(isWall(pos)) {
+            return false;
+        }
+        int countSurrounding = 0;
+        for(Position dire : directions) {
+            Position neighbour = pos.add(dire);
+            if(isWall(neighbour)) {
+                countSurrounding++;
+            }
+        }
+        return countSurrounding == 3;
+    }
+
+
+    /* ================================================ */
+    /* ===============  Test Functions  =============== */
+    /* ================================================ */
     /**
      * convert map into TETile map
      * @return a TETile map
@@ -208,6 +261,8 @@ public class WorldGenerator {
     public TETile[][] convertToTile() {
         growMaze(new Position(1, 1));
         System.out.println("Maze successfully generated.");
+        spareness();
+        System.out.println("Maze successfully spared.");
 
         TETile[][] tiles = new TETile[width][height];
         for(int i = 0; i < width; ++i) {
