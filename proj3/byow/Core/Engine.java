@@ -1,13 +1,15 @@
 package byow.Core;
 
+import byow.InputDemo.InputSource;
+import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
 public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
-    public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+    public static final int WIDTH = 49;
+    public static final int HEIGHT = 25;
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -46,7 +48,47 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        TETile[][] finalWorldFrame = null;
+        InputSource inputSource = new StringInputDevice(input);
+        TETile[][] finalWorldFrame = handleAllInputs(inputSource);
+        // ter.initialize(WIDTH, HEIGHT);
+        // ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
+    }
+
+    private TETile[][] handleAllInputs(InputSource inputSource) {
+        // record whether the map has been generated,
+        // since before and after map generation, some keys perform diff functions
+        boolean isMapGenerated = false;
+        // The map that we're keeping
+        TETile[][] map = new TETile[49][25];
+
+        while (inputSource.possibleNextInput()) {
+            char c = inputSource.getNextKey();
+            switch (c) {
+                case 'n', 'N':
+                    map = beginRecordSeed(inputSource);
+                    break;
+                default:
+                    System.out.println("Unknown input!");
+            }
+        }
+
+        return map;
+    }
+
+    private TETile[][] beginRecordSeed(InputSource inputSource) {
+        String randomSeed = "";
+        while (inputSource.possibleNextInput()) {
+            char c = inputSource.getNextKey();
+            if(c == 's' || c == 'S') {
+                // end entering seed, generate a world and return.
+                WorldGenerator gen = new WorldGenerator(WIDTH, HEIGHT, randomSeed);
+                return gen.convertToTile();
+            } else {
+                randomSeed += c;
+            }
+        }
+        // redundant return statement(never happen for valid input)
+        return null;
     }
 }
