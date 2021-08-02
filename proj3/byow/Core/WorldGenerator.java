@@ -37,14 +37,14 @@ public class WorldGenerator {
     /* the Random object for generating random numbers */
     private Random rand;
     /* Four directions while generating maze */
-    private Position[] directions = {new Position(1, 0), new Position(-1, 0),
-                                    new Position(0, 1), new Position(0, -1)};
+    private final Position[] directions = {new Position(1, 0), new Position(-1, 0),
+                                            new Position(0, 1), new Position(0, -1)};
     /* How many times will we perform spareness */
     private final int SPARE_FACTOR = 240;
     /* randomly choose how many rooms will we place */
     private int roomNum;
     /* max cell toleration can a room overlap with previous objects */
-    private final int MAX_OVERLAP = 18;
+    private final int MAX_OVERLAP = 10;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -70,8 +70,8 @@ public class WorldGenerator {
         // TODO: need a hash converter, convert int to long causes collision.
         Long seed = (long) randomSeed.hashCode();
         this.rand = new Random(seed);
-        // choose how many rooms to generate: [10, 15)
-        roomNum = RandomUtils.uniform(rand, 10, 15);
+        // choose how many rooms to generate: [13, 20)
+        roomNum = RandomUtils.uniform(rand, 13, 20);
     }
 
     /**
@@ -276,7 +276,7 @@ public class WorldGenerator {
             // randomly generate a room size (not too thin/tall)
             // (1) start from a square with ODD size
             // (2) add either width or height an even length
-            int squareLength = RandomUtils.uniform(rand, 1, 3) * 2 + 1;
+            int squareLength = RandomUtils.uniform(rand, 1, 4) * 2 + 1;
             int deltaLength = RandomUtils.uniform(rand, 0, 1 + squareLength / 2) * 2;
             int roomWidth = squareLength;
             int roomHeight = squareLength;
@@ -289,7 +289,9 @@ public class WorldGenerator {
             // randomly choose a cell to put room's bottomLeft corner
             // the cell must have ODD coordinates
             // if 1 <= overlap <= MAX_OVERLAP, carve it in the map
-            while(true) {
+            // again, avoid infinite loop
+            int loopTime2 = 0;
+            while(true && loopTime2++ <= 100) {
                 int roomX = RandomUtils.uniform(rand, (width - roomWidth) / 2 - 1) * 2 + 1;
                 int roomY = RandomUtils.uniform(rand, (height - roomHeight) / 2 - 1) * 2 + 1;
                 Position bottomLeftPos = new Position(roomX, roomY);
