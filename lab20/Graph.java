@@ -385,6 +385,101 @@ public class Graph implements Iterable<Integer> {
         System.out.println();
     }
 
+    /* **************************************** */
+    /* *******  ShortestPath Algorithm  ******* */
+    /* **************************************** */
+
+    /* A class for a node in dijkstra's fringe: (vertex, distance) */
+    private static class DijkNode implements Comparable<DijkNode>{
+        private int vertex, dist;
+
+        public DijkNode(int vertex, int dist) {
+            this.vertex = vertex;
+            this.dist = dist;
+        }
+
+        @Override
+        public int compareTo(DijkNode o) {
+            return this.dist - o.dist;
+        }
+    }
+    public List<Integer> shortestPath(int start, int stop) {
+        boolean[] visited = new boolean[vertexCount];
+        PriorityQueue<DijkNode> fringe = new PriorityQueue<>();
+        // store the shortest dist from start to this vertex, init to inf
+        int[] shortestDist = new int[vertexCount];
+        final int INF = 99999999;
+        for(int i = 0; i < vertexCount; ++i) {
+            shortestDist[i] = INF;
+        }
+
+        // for each node, record which node does the shortest path come from
+        int[] edgeFrom = new int[vertexCount];
+
+        // push start node into fringe
+        fringe.add(new DijkNode(start, 0));
+        visited[start] = true;
+        shortestDist[start] = 0;
+
+        while(!fringe.isEmpty()) {
+            // pop the top node from fringe
+            DijkNode curr = fringe.poll();
+            int currVertex = curr.vertex;
+            int currDist = curr.dist;
+
+            // if reaching stop node
+            if(currVertex == stop) {
+                break;
+            }
+            // else, mark it as visited
+            visited[currVertex] = true;
+
+            // process each neighbour v of current node
+            LinkedList<Edge> neighbours = adjLists[currVertex];
+            for(Edge e : neighbours) {
+                int toVertex = e.to;
+                int weight = e.weight;
+                // if v has already been visited, skip
+                if(visited[toVertex]) {
+                    continue;
+                }
+                // else, perform relaxing
+                if(shortestDist[toVertex] > shortestDist[currVertex] + weight) {
+                    shortestDist[toVertex] = shortestDist[currVertex] + weight;
+                    fringe.add(new DijkNode(toVertex, shortestDist[toVertex]));
+                    edgeFrom[toVertex] = currVertex;
+                }
+            }
+        }
+
+        // construct shortest path from end to start
+        Stack<Integer> reversedPath = new Stack<>();
+        for(int i = stop; i != start; i = edgeFrom[i]) {
+            reversedPath.add(i);
+        }
+        // don't forget to add start
+        reversedPath.add(start);
+
+        // convert stack to list
+        LinkedList<Integer> shortestPath = new LinkedList<>();
+        while(!reversedPath.isEmpty()) {
+            shortestPath.add(reversedPath.pop());
+        }
+        return shortestPath;
+    }
+
+    /* return the Edge object from u to v */
+    private Edge getEdge(int u, int v) {
+        LinkedList<Edge> edges = adjLists[u];
+        for(Edge e : edges) {
+            if(e.to == v) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+
     private void printTopologicalSort() {
         System.out.println("Topological sort");
         List<Integer> result = topologicalSort();
