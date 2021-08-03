@@ -425,7 +425,6 @@ public class Graph implements Iterable<Integer> {
             // pop the top node from fringe
             DijkNode curr = fringe.poll();
             int currVertex = curr.vertex;
-            int currDist = curr.dist;
 
             // if reaching stop node
             if(currVertex == stop) {
@@ -467,18 +466,6 @@ public class Graph implements Iterable<Integer> {
         }
         return shortestPath;
     }
-
-    /* return the Edge object from u to v */
-    private Edge getEdge(int u, int v) {
-        LinkedList<Edge> edges = adjLists[u];
-        for(Edge e : edges) {
-            if(e.to == v) {
-                return e;
-            }
-        }
-        return null;
-    }
-
 
     private void printTopologicalSort() {
         System.out.println("Topological sort");
