@@ -40,11 +40,11 @@ public class WorldGenerator {
     private final Position[] directions = {new Position(1, 0), new Position(-1, 0),
                                             new Position(0, 1), new Position(0, -1)};
     /* How many times will we perform spareness */
-    private final int SPARE_FACTOR = 240;
+    private final int SPARE_FACTOR = 340;
     /* randomly choose how many rooms will we place */
     private int roomNum;
     /* max cell toleration can a room overlap with previous objects */
-    private final int MAX_OVERLAP = 10;
+    private final int MAX_OVERLAP = 5;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -70,8 +70,8 @@ public class WorldGenerator {
         // TODO: need a hash converter, convert int to long causes collision.
         Long seed = (long) randomSeed.hashCode();
         this.rand = new Random(seed);
-        // choose how many rooms to generate: [13, 20)
-        roomNum = RandomUtils.uniform(rand, 13, 20);
+        // choose how many rooms to generate: [13, 16)
+        roomNum = RandomUtils.uniform(rand, 13, 16);
     }
 
     /**
@@ -422,7 +422,7 @@ public class WorldGenerator {
      * main method for test.
      */
     public static void main(String[] args) {
-        WorldGenerator g = new WorldGenerator(49, 25, "cs61BL");
+        WorldGenerator g = new WorldGenerator(49, 25, "just4fun");
         TERenderer ter = new TERenderer();
         ter.initialize(49, 25);
 
