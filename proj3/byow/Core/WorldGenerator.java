@@ -33,18 +33,19 @@ public class WorldGenerator {
     /* the width and height of map, make sure it's odd */
     private int width, height;
     /* a factor deciding winding percent of maze, used while generating perfect maze */
-    private final double WINDING_PERCENT = 0.4;
+    private final double WINDING_PERCENT = 0.6;
     /* the Random object for generating random numbers */
     private Random rand;
     /* Four directions while generating maze */
     private final Position[] directions = {new Position(1, 0), new Position(-1, 0),
                                             new Position(0, 1), new Position(0, -1)};
-    /* How many times will we perform spareness */
-    private final int SPARE_FACTOR = 340;
+    /* How many times will we perform spareness
+    * Before and After generating room, [0]:before, [1]:after */
+    private final int SPARE_FACTOR[] = new int[]{280, 20};
     /* randomly choose how many rooms will we place */
     private int roomNum;
     /* max cell toleration can a room overlap with previous objects */
-    private final int MAX_OVERLAP = 5;
+    private final int MAX_OVERLAP = 6;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -218,10 +219,13 @@ public class WorldGenerator {
     /**
      * perform spareness to delete some dead-ends
      * delete exactly SPARE_FACTOR cells.
+     * @param stage 0 if before and 1 if after generating room
      */
-    private void spareness() {
+    private void spareness(int stage) {
         int spareCount = 0;
-        while(true) {
+        // don't iterator over 1000 times: avoid infinite loop
+        int iterTime = 0;
+        while(true && iterTime++ < 1000) {
             for(int i = 0; i < width; ++i) {
                 for(int j = 0; j < height; ++j) {
                     Position currentPos = new Position(i, j);
@@ -231,7 +235,7 @@ public class WorldGenerator {
                         spareCount++;
                     }
                     // if reach spare limit, terminate
-                    if(spareCount == SPARE_FACTOR) {
+                    if(spareCount == SPARE_FACTOR[stage]) {
                         return;
                     }
                 }
@@ -272,7 +276,7 @@ public class WorldGenerator {
     private void placeRooms() {
         // add a loop time limit, to avoid infinite loop
         int loopTime = 0;
-        for(int roomCount = 0; roomCount < roomNum && loopTime <= 1000; ++roomCount, ++loopTime) {
+        for(int roomCount = 0; roomCount < roomNum && loopTime <= 3000; ++roomCount, ++loopTime) {
             // randomly generate a room size (not too thin/tall)
             // (1) start from a square with ODD size
             // (2) add either width or height an even length
@@ -291,7 +295,7 @@ public class WorldGenerator {
             // if 1 <= overlap <= MAX_OVERLAP, carve it in the map
             // again, avoid infinite loop
             int loopTime2 = 0;
-            while(true && loopTime2++ <= 100) {
+            while(true && loopTime2++ <= 200) {
                 int roomX = RandomUtils.uniform(rand, (width - roomWidth) / 2 - 1) * 2 + 1;
                 int roomY = RandomUtils.uniform(rand, (height - roomHeight) / 2 - 1) * 2 + 1;
                 Position bottomLeftPos = new Position(roomX, roomY);
@@ -396,10 +400,12 @@ public class WorldGenerator {
     public TETile[][] convertToTile() {
         growMaze(new Position(1, 1));
         System.out.println("Maze successfully generated.");
-        spareness();
+        spareness(0);
         System.out.println("Maze successfully spared.");
         placeRooms();
         System.out.println("Room successfully generated.");
+        spareness(1);
+        System.out.println("Maze successfully spared AFTER generating room.");
         removeUnnecessaryWalls();
         System.out.println("Unnecessary Walls successfully removed.");
 
@@ -422,7 +428,7 @@ public class WorldGenerator {
      * main method for test.
      */
     public static void main(String[] args) {
-        WorldGenerator g = new WorldGenerator(49, 25, "just4fun");
+        WorldGenerator g = new WorldGenerator(49, 25, "cs61bl");
         TERenderer ter = new TERenderer();
         ter.initialize(49, 25);
 
