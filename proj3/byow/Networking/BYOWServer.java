@@ -1,5 +1,7 @@
 package byow.Networking;
 
+import byow.Core.WorldGenerator;
+import byow.TileEngine.TERenderer;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.*;
@@ -128,5 +130,25 @@ public class BYOWServer {
 
     private static File join(File first, String... others) {
         return Paths.get(first.getPath(), others).toFile();
+    }
+
+    /* For test */
+    public static void main(String[] args) {
+        // start server on port 61
+        BYOWServer server;
+        try {
+            server = new BYOWServer(61);
+        } catch (Exception e) {
+            System.out.println("Error while creating server on port 61.");
+            return;
+        }
+
+        // create a map
+        WorldGenerator gen = new WorldGenerator(49, 25, "just4fun");
+        TERenderer ter = new TERenderer();
+        ter.initialize(49, 25);
+        ter.renderFrame(gen.convertToTile());
+
+        server.initialize(50, 30);
     }
 }
