@@ -202,9 +202,45 @@ public class Graph {
         return span;
     }
 
+    /* A comparator for Edge priority queue used in kruskal */
+    private class edgeComp implements Comparator<Edge> {
+        @Override
+        public int compare(Edge o1, Edge o2) {
+            return o1.getWeight() - o2.getWeight();
+        }
+    }
+
     public Graph kruskals() {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph g = new Graph();
+
+        // build a disjoint set
+        TreeSet<Integer> vertices = getAllVertices();
+        int vertexNum = vertices.size();
+        DisjointSet disjoint = new DisjointSet(vertices.size());
+
+        // add all edges to priority queue, compared using edgeComp
+        PriorityQueue<Edge> pq = new PriorityQueue<>(new edgeComp());
+        TreeSet<Edge> edges = getAllEdges();
+        for(Edge e : edges) {
+            pq.add(e);
+        }
+
+        // iterate all edges while ensuring spanning tree's size < vertexNum - 1
+        while(!pq.isEmpty()) {
+            // spanning tree's size = vertexNum - 1, stop
+            if(g.getAllEdges().size() == vertexNum - 1) {
+                break;
+            }
+            Edge e = pq.poll();
+            int from = e.getSource();
+            int to = e.getDest();
+            if(!disjoint.isConnected(from, to)) {
+                disjoint.Union(from, to);
+                g.addEdge(from, to, e.getWeight());
+            }
+        }
+
+        return g;
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and
@@ -272,6 +308,39 @@ public class Graph {
         System.out.println("\n=== Prim : graphTestMultiEdge.in ===");
         g = loadFromText("inputs/graphTestMultiEdge.in");
         res = g.prims(0);
+        allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
+        }
+
+        // Kruskal algorithm
+        System.out.println("\n=== Kruskal : graphTestNormal.in ===");
+        g = loadFromText("inputs/graphTestNormal.in");
+        res = g.kruskals();
+        allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
+        }
+
+        System.out.println("\n=== Kruskal : graphTestSomeDisjoint.in ===");
+        g = loadFromText("inputs/graphTestSomeDisjoint.in");
+        res = g.kruskals();
+        allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
+        }
+
+        System.out.println("\n=== Kruskal : graphTestMultiEdge.in ===");
+        g = loadFromText("inputs/graphTestMultiEdge.in");
+        res = g.kruskals();
+        allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
+        }
+
+        System.out.println("\n=== Kruskal : graphTestAllDisjoint.in ===");
+        g = loadFromText("inputs/graphTestAllDisjoint.in");
+        res = g.kruskals();
         allEdges = res.getAllEdges();
         for(Edge e : allEdges) {
             System.out.println(e);
