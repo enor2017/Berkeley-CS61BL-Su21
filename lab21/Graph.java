@@ -1,15 +1,9 @@
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.io.IOException;
-import java.util.Random;
-import java.util.Queue;
-import java.util.ArrayDeque;
 
 /* A mutable and finite Graph object. Edge labels are stored via a HashMap
    where labels are mapped to a key calculated by the following. The graph is
@@ -129,9 +123,83 @@ public class Graph {
         allEdges.add(e1);
     }
 
+    /* ************************************************** */
+    /* ****** Minimum Spanning Tree Implementation ****** */
+    /* ************************************************** */
+
+    /* each node in priority queue is a vector [vertex, distToTree] */
+    private static class PQNode implements Comparable<PQNode> {
+        int vertex, dist;
+
+        public PQNode(int vertex, int dist) {
+            this.vertex = vertex;
+            this.dist = dist;
+        }
+
+        @Override
+        public int compareTo(PQNode o) {
+            return dist - o.dist;
+        }
+    }
+
     public Graph prims(int start) {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph span = new Graph();
+
+        int vertexNum = getAllVertices().size();
+        // the dist from node to spanning tree
+        int[] distToTree = new int[vertexNum];
+        // if a node has been visited
+        boolean[] visited = new boolean[vertexNum];
+        // fringe, compared by distToTree
+        PriorityQueue<PQNode> fringe = new PriorityQueue<>();
+        // which node does it come from, in spanning tree
+        int[] nodeFrom = new int[vertexNum];
+
+        // set other nodes' dist to INF
+        final int INF = 999999;
+        TreeSet<Integer> allVertices = getAllVertices();
+        for(int v : allVertices) {
+            distToTree[v] = INF;
+        }
+
+        // process start node
+        visited[start] = true;
+        distToTree[start] = 0;
+        fringe.add(new PQNode(start, 0));
+
+        while(!fringe.isEmpty()) {
+            // pop the nearest node
+            PQNode current = fringe.poll();
+            int currentNode = current.vertex;
+            int currentDis = current.dist;
+            visited[currentNode] = true;
+
+            // iterate all neighbours
+            TreeSet<Edge> edges = getEdges(currentNode);
+            for(Edge e : edges) {
+                int to = e.getDest();
+                int w = e.getWeight();
+                // if visited, do nothing
+                if(visited[to]) continue;
+                // else, perform relaxing
+                if(w < distToTree[to]) {
+                    distToTree[to] = w;
+                    nodeFrom[to] = currentNode;
+                    fringe.add(new PQNode(to, distToTree[to]));
+                }
+            }
+
+        }
+
+        // add edges to form a spanning tree
+        TreeSet<Integer> vertices = getAllVertices();
+        for(int v : vertices) {
+            // add to graph only if it's reachable form start
+            if(v != start && distToTree[v] != INF) {
+                span.addEdge(nodeFrom[v], v, distToTree[v]);
+            }
+        }
+        return span;
     }
 
     public Graph kruskals() {
@@ -179,6 +247,34 @@ public class Graph {
             System.err.println("Caught IOException: " + e.getMessage());
             System.exit(1);
             return null;
+        }
+    }
+
+    // main method for simple tests
+    public static void main(String[] args) {
+        // Prim algorithm
+        System.out.println("\n=== Prim : graphTestNormal.in ===");
+        Graph g = loadFromText("inputs/graphTestNormal.in");
+        Graph res = g.prims(0);
+        TreeSet<Edge> allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
+        }
+
+        System.out.println("\n=== Prim : graphTestSomeDisjoint.in ===");
+        g = loadFromText("inputs/graphTestSomeDisjoint.in");
+        res = g.prims(0);
+        allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
+        }
+
+        System.out.println("\n=== Prim : graphTestMultiEdge.in ===");
+        g = loadFromText("inputs/graphTestMultiEdge.in");
+        res = g.prims(0);
+        allEdges = res.getAllEdges();
+        for(Edge e : allEdges) {
+            System.out.println(e);
         }
     }
 }
