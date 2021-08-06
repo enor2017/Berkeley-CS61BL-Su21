@@ -199,11 +199,10 @@ public class DLList<T extends Comparable<T>> {
 
         // sort and append DLLists
         DLList<T> sortedSmall = smallElements.quicksort();
-        DLList<T> sortedEqual = equalElements.quicksort();
         DLList<T> sortedLarge = largeElements.quicksort();
         // merge 2 and 3, then merge 1 to them
-        sortedEqual.append(sortedLarge);
-        sortedSmall.append(sortedEqual);
+        equalElements.append(sortedLarge);
+        sortedSmall.append(equalElements);
         return sortedSmall;
     }
 
@@ -268,5 +267,10 @@ public class DLList<T extends Comparable<T>> {
         sortedValues = values.quicksort();
         System.out.print("After quicksort: ");
         System.out.println(sortedValues);
+
+        System.out.println("quicksort pressure test:");
+        values = generateRandomIntegerDLList(200000);
+        sortedValues = values.quicksort();
+        System.out.println("done.");
     }
 }
