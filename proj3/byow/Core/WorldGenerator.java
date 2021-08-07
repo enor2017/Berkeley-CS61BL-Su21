@@ -39,9 +39,14 @@ public class WorldGenerator {
     /* Four directions while generating maze */
     private final Position[] directions = {new Position(1, 0), new Position(-1, 0),
                                             new Position(0, 1), new Position(0, -1)};
+    /* Eight directions while removing redundant walls */
+    private final Position[] FullDirections = {new Position(1, 0), new Position(-1, 0),
+            new Position(0, 1), new Position(0, -1),
+            new Position(1, 1), new Position(1, -1),
+            new Position(-1, 1), new Position(-1, -1)};
     /* How many times will we perform spareness
     * Before and After generating room, [0]:before, [1]:after */
-    private final int SPARE_FACTOR[] = new int[]{450, 50};
+    private final int SPARE_FACTOR[] = new int[]{450, 150};
     /* randomly choose how many rooms will we place */
     private int roomNum;
     /* max cell toleration can a room overlap with previous objects */
@@ -359,35 +364,34 @@ public class WorldGenerator {
      * for the sake of simplicity, remove walls who has four wall neighbours
      */
     private void removeUnnecessaryWalls() {
-        // TODO: this function performs so bad that I remove it. Waiting for some better ideas
-        return;
-//        // store positions that are to removed
-//        Stack<Position> toRemove = new Stack<>();
-//
-//        for(int i = 0; i < width; ++i) {
-//            for(int j = 0; j < height; ++j) {
-//                Position pos = new Position(i, j);
-//                // loop four directions
-//                int countWallNeighbours = 0;
-//                for(Position dire : directions) {
-//                    Position neighbour = pos.add(dire);
-//                    if(checkPositionInBound(neighbour) && isWall(neighbour)) {
-//                        countWallNeighbours++;
-//                    }
-//                }
-//                // uncarve the cell iff has four wall neighbours
-//                // notice that we cannot flag those cells on original map!
-//                if(countWallNeighbours == 4) {
-//                    toRemove.add(pos);
-//                }
-//            }
-//        }
-//
-//        // here we pop cells and mark on original map
-//        while(!toRemove.isEmpty()) {
-//            Position pos = toRemove.pop();
-//            map[pos.getX()][pos.getY()] = -2;
-//        }
+        // store positions that are to removed
+        Stack<Position> toRemove = new Stack<>();
+
+        for(int i = 0; i < width; ++i) {
+            for(int j = 0; j < height; ++j) {
+                Position pos = new Position(i, j);
+                // loop 8 directions, including diagonals
+                int countWallNeighbours = 0;
+                for(Position dire : FullDirections) {
+                    Position neighbour = pos.add(dire);
+                    // count neighbours that: out-of bound, or is wall
+                    if(!checkPositionInBound(neighbour) || isWall(neighbour)) {
+                        countWallNeighbours++;
+                    }
+                }
+                // uncarve the cell iff has 8 wall neighbours or out-of-bound neighbours
+                // notice that we cannot flag those cells on original map!
+                if(countWallNeighbours == 8) {
+                    toRemove.add(pos);
+                }
+            }
+        }
+
+        // here we pop cells and mark on original map
+        while(!toRemove.isEmpty()) {
+            Position pos = toRemove.pop();
+            map[pos.getX()][pos.getY()] = -2;
+        }
     }
 
     /* ================================================ */
