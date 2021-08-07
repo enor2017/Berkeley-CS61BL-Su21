@@ -1,21 +1,35 @@
 package byow.Core;
 
-import byow.InputDemo.InputSource;
-import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
+
+import java.awt.*;
 
 public class Engine {
     TERenderer ter = new TERenderer();
-    /* Feel free to change the width and height. */
-    public static final int WIDTH = 49;
-    public static final int HEIGHT = 25;
+    /* The width and height of game screen */
+    private static final int WIDTH = 59;
+    private static final int HEIGHT = 41;
+    /* The width and height of start menu */
+    private final int MENU_WIDTH = 25;
+    private final int MENU_HEIGHT = 40;
+    /* indicating whether game is end */
+    private boolean isGameOver = false;
+    /* Some useful definitions for StdDraw */
+    Font bigFont = new Font("Monaco", Font.BOLD, 30);
+    Font medFont = new Font("Monaco", Font.BOLD, 22);
+    Font smallFont = new Font("Monoco", Font.PLAIN,16);
+    /* The map that we're keeping */
+    TETile[][] map = new TETile[WIDTH][HEIGHT];
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        InputSource keyboardInput = new KeyboardInputSource();
+        gameLoop(keyboardInput);
     }
 
     /**
@@ -40,55 +54,118 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
-        // passed in as an argument, and return a 2D tile representation of the
-        // world that would have been drawn if the same inputs had been given
-        // to interactWithKeyboard().
-        //
-        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
-        // that works for many different input types.
-
         InputSource inputSource = new StringInputDevice(input);
-        TETile[][] finalWorldFrame = handleAllInputs(inputSource);
-        // ter.initialize(WIDTH, HEIGHT);
-        // ter.renderFrame(finalWorldFrame);
-        return finalWorldFrame;
-    }
-
-    private TETile[][] handleAllInputs(InputSource inputSource) {
-        // record whether the map has been generated,
-        // since before and after map generation, some keys perform diff functions
-        boolean isMapGenerated = false;
-        // The map that we're keeping
-        TETile[][] map = new TETile[49][25];
-
-        while (inputSource.possibleNextInput()) {
-            char c = inputSource.getNextKey();
-            switch (c) {
-                case 'n', 'N':
-                    map = beginRecordSeed(inputSource);
-                    break;
-                default:
-                    System.out.println("Unknown input!");
-            }
-        }
-
+        gameLoop(inputSource);
         return map;
     }
 
-    private TETile[][] beginRecordSeed(InputSource inputSource) {
+    private void handleKeyboardInput(char input, InputSource inputSource) {
+        switch (input) {
+            case 'n', 'N':
+                // display enterSeed window
+                if(inputSource.isDisplayable()) {
+                    displaySeed("");
+                }
+                String seed = beginRecordSeed(inputSource);
+                WorldGenerator worldGen = new WorldGenerator(WIDTH, HEIGHT, seed);
+                map = worldGen.convertToTile();
+                // after entering seed, display game window
+                if(inputSource.isDisplayable()) {
+                    displayGameWindow(map);
+                }
+                break;
+            default:
+                System.out.println("Unknown input!");
+        }
+    }
+
+    /**
+     * the main game loop, taking an input Source
+     * @param inputSource Keyboard or String Input
+     */
+    private void gameLoop(InputSource inputSource) {
+        // if keyboard input, display menu
+        if(inputSource.isDisplayable()) {
+            displayMenu();
+        }
+
+        while(!isGameOver) {
+            // For String inputSource, no next input means game over
+            if(!inputSource.isDisplayable() && inputSource.possibleNextInput()) {
+                break;
+            }
+            // for each time, interact with keyboard and mouse
+            if(inputSource.possibleNextInput()) {
+                // get the map after handling the input
+                handleKeyboardInput(inputSource.getNextKey(), inputSource);
+            }
+            // mouse position
+//            double mouseX = StdDraw.mouseX();
+//            double mouseY = StdDraw.mouseY();
+//            System.out.println("Mouse position: " + mouseX + ", " + mouseY);
+        }
+    }
+
+    private String beginRecordSeed(InputSource inputSource) {
         String randomSeed = "";
-        while (inputSource.possibleNextInput()) {
-            char c = inputSource.getNextKey();
-            if(c == 's' || c == 'S') {
-                // end entering seed, generate a world and return.
-                WorldGenerator gen = new WorldGenerator(WIDTH, HEIGHT, randomSeed);
-                return gen.convertToTile();
-            } else {
-                randomSeed += c;
+        while(true) {
+            if(inputSource.possibleNextInput()) {
+                char c = inputSource.getNextKey();
+                if(c == 's' || c == 'S') {
+                    // end entering seed and return the seed.
+                    return randomSeed;
+                } else {
+                    randomSeed += c;
+                    // for keyboard input, display seed window
+                    if(inputSource.isDisplayable()) {
+                        displaySeed(randomSeed);
+                    }
+                }
             }
         }
-        // redundant return statement(never happen for valid input)
-        return null;
+    }
+
+    private void displayMenu() {
+        StdDraw.setCanvasSize(MENU_WIDTH * 16, MENU_HEIGHT * 16);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.setXscale(0, MENU_WIDTH);
+        StdDraw.setYscale(0, MENU_HEIGHT);
+        StdDraw.clear(Color.BLACK);
+        StdDraw.enableDoubleBuffering();
+
+        // draw title
+        StdDraw.setFont(bigFont);
+        StdDraw.text(MENU_WIDTH / 2.0, MENU_HEIGHT * 0.7, "CS61B: THE GAME");
+
+        // draw menu options
+        StdDraw.setFont(medFont);
+        StdDraw.text(MENU_WIDTH / 2.0, MENU_HEIGHT * 0.5, "New Game (N)");
+        StdDraw.text(MENU_WIDTH / 2.0, MENU_HEIGHT * 0.4, "Load Game (L)");
+        StdDraw.text(MENU_WIDTH / 2.0, MENU_HEIGHT * 0.3, "Quit (Q)");
+        StdDraw.show();
+    }
+
+    private void displaySeed(String seed) {
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setFont(bigFont);
+        StdDraw.text(MENU_WIDTH / 2.0, MENU_HEIGHT * 0.7, "Please Enter A Seed:");
+
+        StdDraw.setFont(medFont);
+        StdDraw.text(MENU_WIDTH / 2.0, MENU_HEIGHT * 0.5, seed);
+        StdDraw.show();
+    }
+
+    private void displayGameWindow(TETile[][] tiles) {
+        StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.setXscale(0, WIDTH);
+        StdDraw.setYscale(0, HEIGHT);
+        StdDraw.clear(Color.BLACK);
+
+        // display game maze
+        ter.initialize(WIDTH, HEIGHT);
+        ter.renderFrame(tiles);
+
+        StdDraw.show();
     }
 }

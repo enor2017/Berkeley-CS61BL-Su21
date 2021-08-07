@@ -41,11 +41,11 @@ public class WorldGenerator {
                                             new Position(0, 1), new Position(0, -1)};
     /* How many times will we perform spareness
     * Before and After generating room, [0]:before, [1]:after */
-    private final int SPARE_FACTOR[] = new int[]{280, 20};
+    private final int SPARE_FACTOR[] = new int[]{450, 50};
     /* randomly choose how many rooms will we place */
     private int roomNum;
     /* max cell toleration can a room overlap with previous objects */
-    private final int MAX_OVERLAP = 6;
+    private final int MAX_OVERLAP = 8;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -276,11 +276,11 @@ public class WorldGenerator {
     private void placeRooms() {
         // add a loop time limit, to avoid infinite loop
         int loopTime = 0;
-        for(int roomCount = 0; roomCount < roomNum && loopTime <= 3000; ++roomCount, ++loopTime) {
+        for(int roomCount = 0; roomCount < roomNum && loopTime <= 4000; ++roomCount, ++loopTime) {
             // randomly generate a room size (not too thin/tall)
             // (1) start from a square with ODD size
             // (2) add either width or height an even length
-            int squareLength = RandomUtils.uniform(rand, 1, 4) * 2 + 1;
+            int squareLength = RandomUtils.uniform(rand, 2, 4) * 2 + 1;
             int deltaLength = RandomUtils.uniform(rand, 0, 1 + squareLength / 2) * 2;
             int roomWidth = squareLength;
             int roomHeight = squareLength;
@@ -295,7 +295,7 @@ public class WorldGenerator {
             // if 1 <= overlap <= MAX_OVERLAP, carve it in the map
             // again, avoid infinite loop
             int loopTime2 = 0;
-            while(true && loopTime2++ <= 200) {
+            while(true && loopTime2++ <= 2000) {
                 int roomX = RandomUtils.uniform(rand, (width - roomWidth) / 2 - 1) * 2 + 1;
                 int roomY = RandomUtils.uniform(rand, (height - roomHeight) / 2 - 1) * 2 + 1;
                 Position bottomLeftPos = new Position(roomX, roomY);
@@ -428,9 +428,9 @@ public class WorldGenerator {
      * main method for test.
      */
     public static void main(String[] args) {
-        WorldGenerator g = new WorldGenerator(49, 25, "cs61bl");
+        WorldGenerator g = new WorldGenerator(59, 41, "cs61bl");
         TERenderer ter = new TERenderer();
-        ter.initialize(49, 25);
+        ter.initialize(59, 41);
 
         ter.renderFrame(g.convertToTile());
     }
