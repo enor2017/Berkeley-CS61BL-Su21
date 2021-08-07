@@ -28,7 +28,8 @@ public class WorldGenerator {
     /* a counter for the number of areas, area # starts from 0
       Actually corridors are labelled as 0, while rooms are labelled from 1. */
     private int areaNum = -1;
-    /* the map used when generating the world, -2 for nothing, -1 for wall, others for area */
+    /* the map used when generating the world, -2 for nothing, -1 for wall,
+        -3 for avatar, others for area */
     private int[][] map;
     /* the width and height of map, make sure it's odd */
     private int width, height;
@@ -51,6 +52,8 @@ public class WorldGenerator {
     private int roomNum;
     /* max cell toleration can a room overlap with previous objects */
     private final int MAX_OVERLAP = 8;
+    /* record avatar's position */
+    private Position avatar = null;
 
     /**
      * constructor: given width, height and random seed(string)
@@ -87,6 +90,15 @@ public class WorldGenerator {
      */
     private boolean isWall(Position pos) {
         return (checkPositionInBound(pos)) && map[pos.getX()][pos.getY()] == -1;
+    }
+
+    /**
+     * given a position, return whether it's a floor
+     * @param pos position
+     * @return true if map[x][y] == -1
+     */
+    private boolean isFloor(Position pos) {
+        return (checkPositionInBound(pos)) && map[pos.getX()][pos.getY()] >= 0;
     }
 
     /**
@@ -394,6 +406,51 @@ public class WorldGenerator {
         }
     }
 
+    /* ================================================================ */
+    /* ===============  Part V: Place avatar in a room  =============== */
+    /* ================================================================ */
+
+    /**
+     * Place the avatar at a proper position
+     */
+    public void placeAvatar() {
+        // keep generating random positions
+        while(true) {
+            // try to place avatar in the middle area
+            int x = RandomUtils.uniform(rand, width / 6, width * 5 / 6);
+            int y = RandomUtils.uniform(rand, height / 6, height * 5 / 6);
+            Position pos = new Position(x, y);
+            // continue to check only if current position is floor
+            if(!isFloor(pos)) {
+                continue;
+            }
+            boolean okPlace = true;
+            // place it if four neighbours are all floor
+            for(Position dire : directions) {
+                Position neighbour = pos.add(dire);
+                // if neighbour out of bound or is not floor, break.
+                if(!checkPositionInBound(neighbour) || !isFloor(neighbour)) {
+                    okPlace = false;
+                    break;
+                }
+            }
+            // good place? record it and return
+            if(okPlace) {
+                map[x][y] = -3;
+                avatar = pos;
+                return;
+            }
+        }
+    }
+
+    /**
+     * get avatar's position
+     * @return avatar's position, with type Position
+     */
+    public Position getAvatarPos() {
+        return avatar;
+    }
+
     /* ================================================ */
     /* ===============  Test Functions  =============== */
     /* ================================================ */
@@ -412,6 +469,8 @@ public class WorldGenerator {
         System.out.println("Maze successfully spared AFTER generating room.");
         removeUnnecessaryWalls();
         System.out.println("Unnecessary Walls successfully removed.");
+        placeAvatar();
+        System.out.println("Avatar successfully placed.");
 
         TETile[][] tiles = new TETile[width][height];
         for(int i = 0; i < width; ++i) {
@@ -420,6 +479,8 @@ public class WorldGenerator {
                     tiles[i][j] = Tileset.NOTHING;
                 } else if(map[i][j] == -1) {
                     tiles[i][j] = Tileset.WALL;
+                } else if (map[i][j] == -3){
+                    tiles[i][j] = Tileset.AVATAR;
                 } else {
                     tiles[i][j] = Tileset.FLOOR;
                 }

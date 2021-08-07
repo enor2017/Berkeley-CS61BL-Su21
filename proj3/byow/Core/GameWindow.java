@@ -22,7 +22,9 @@ public class GameWindow {
     /* Some useful definitions for StdDraw */
     Font bigFont = new Font("Monaco", Font.BOLD, 30);
     Font medFont = new Font("Monaco", Font.BOLD, 22);
-    Font smallFont = new Font("Monoco", Font.PLAIN,16);
+    Font smallFont = new Font("Monaco", Font.PLAIN,16);
+    /* if need to change canvas size to map size, used for 1st time displaying map */
+    boolean changeSize = true;
 
     /**
      * function to get a maze world with given seed
@@ -76,14 +78,18 @@ public class GameWindow {
      * @param tiles the maze map to display
      */
     public void displayGameWindow(TETile[][] tiles) {
-        StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16);
+        // if 1st time display map, remember to change canvas size
+        if(changeSize) {
+            StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16);
+            StdDraw.setXscale(0, WIDTH);
+            StdDraw.setYscale(0, HEIGHT);
+            ter.initialize(WIDTH, HEIGHT);
+            changeSize = false;
+        }
         StdDraw.setPenColor(Color.WHITE);
-        StdDraw.setXscale(0, WIDTH);
-        StdDraw.setYscale(0, HEIGHT);
         StdDraw.clear(Color.BLACK);
 
         // display game maze
-        ter.initialize(WIDTH, HEIGHT);
         ter.renderFrame(tiles);
 
         StdDraw.show();

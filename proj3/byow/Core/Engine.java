@@ -1,6 +1,7 @@
 package byow.Core;
 
 import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
 
 /**
  * This class only handle game logics, all things about GUI are in GameWindow.java
@@ -9,9 +10,11 @@ public class Engine {
     /* indicating whether game is end */
     private boolean isGameOver = false;
     /* The map that we're keeping */
-    TETile[][] map = new TETile[GameWindow.WIDTH][GameWindow.HEIGHT];
+    TETile[][] map = null;
     /* GameWindow for handling GUI part */
     GameWindow gameWindow = new GameWindow();
+    /* Avatar's position */
+    Position avatar = null;
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -84,16 +87,38 @@ public class Engine {
     private void handleKeyboardInput(char input, InputSource inputSource) {
         switch (input) {
             case 'n', 'N':
+                // NOTICE: if already generated map, don't do anything!
+                if(map != null) break;
                 // display enterSeed window
                 if(inputSource.isDisplayable()) {
                     gameWindow.displaySeed("");
                 }
                 String seed = beginRecordSeed(inputSource);
                 map = gameWindow.getWorld(seed);
+                // also find the position of avatar, but this is not elegant :(
+                // avatar can be directly passed from WorldGenerator, but that's also inelegant to implement.
+                findAvatar();
                 // after entering seed, display game window
                 if(inputSource.isDisplayable()) {
                     gameWindow.displayGameWindow(map);
                 }
+                break;
+            case 'w', 'W':
+                // move avatar, and check whether refresh display
+                moveAvatar(new Position(0, 1));
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                break;
+            case 'a', 'A':
+                moveAvatar(new Position(-1, 0));
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                break;
+            case 's', 'S':
+                moveAvatar(new Position(0, -1));
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                break;
+            case 'd', 'D':
+                moveAvatar(new Position(1, 0));
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
                 break;
             default:
                 System.out.println("Unknown input!");
@@ -124,4 +149,59 @@ public class Engine {
         }
     }
 
+    /**
+     * find avatar's position in current map, store in this.avatar.
+     */
+    private void findAvatar() {
+        for(int i = 0; i < GameWindow.WIDTH; ++i) {
+            for(int j = 0; j < GameWindow.HEIGHT; ++j) {
+                if(map[i][j] == Tileset.AVATAR) {
+                    avatar = new Position(i, j);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * set avatar to the given position
+     * @param pos new avatar position
+     */
+    private void setAvatarPos(Position pos) {
+        // make original position to floor and new position to avatar
+        map[avatar.getX()][avatar.getY()] = Tileset.FLOOR;
+        avatar = pos;
+        map[avatar.getX()][avatar.getY()] = Tileset.AVATAR;
+    }
+
+    /**
+     * check if the given position is in board bound
+     * @param pos position to be checked
+     * @return true if in bound, false else
+     */
+    private boolean checkPositionInBound(Position pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        return (x >= 0 && x < GameWindow.WIDTH) && (y >= 0 && y < GameWindow.HEIGHT);
+    }
+
+    /**
+     * check if the given position is a floor
+     * @param pos position to be checked
+     * @return true if is floor, false else
+     */
+    private boolean isFloor(Position pos) {
+        return map[pos.getX()][pos.getY()] == Tileset.FLOOR;
+    }
+
+    /**
+     * Move avatar in direction: dire, and update gameMap.
+     * @param dire which dire does avatar move
+     */
+    private void moveAvatar(Position dire) {
+        Position newPos = avatar.add(dire);
+        if(checkPositionInBound(newPos) && isFloor(newPos)) {
+            setAvatarPos(newPos);
+        }
+    }
 }
