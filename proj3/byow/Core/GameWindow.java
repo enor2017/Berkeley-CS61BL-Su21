@@ -101,6 +101,9 @@ public class GameWindow {
         StdDraw.show();
     }
 
+    /**
+     * Clear left font bar, used every time before display life
+     */
     private void clearLeftFontArea() {
         StdDraw.setPenColor(Color.BLACK);
         StdDraw.filledRectangle(MAP_WIDTH / 4.0, (MAP_HEIGHT + HEIGHT) / 2.0,
@@ -108,6 +111,9 @@ public class GameWindow {
         StdDraw.setPenColor(Color.WHITE);
     }
 
+    /**
+     * Clear left font bar, used every time before display tile info
+     */
     private void clearRightFontArea() {
         StdDraw.setPenColor(Color.BLACK);
         StdDraw.filledRectangle(MAP_WIDTH * 0.75, (MAP_HEIGHT + HEIGHT) / 2.0,
@@ -115,6 +121,10 @@ public class GameWindow {
         StdDraw.setPenColor(Color.WHITE);
     }
 
+    /**
+     * display life info at top-left
+     * @param life avatar's remaining life
+     */
     private void displayLife(int life) {
         clearLeftFontArea();
         StdDraw.setFont(smallFont);
@@ -122,15 +132,23 @@ public class GameWindow {
         // StdDraw.show() is called in displayGameWindow();
     }
 
+    /**
+     * return mouse position (in tile num)
+     * @return mouse position, with type Position
+     */
     public Position getMousePos() {
         int x = (int) StdDraw.mouseX();
         int y = (int) StdDraw.mouseY();
         // System.out.println("x: " + x + ", y: " + y);
-        // delay 100ms avoid so many refreshing
-//        StdDraw.pause(20);
+        // delay 20ms avoid so many refreshing
+        // StdDraw.pause(20);
         return new Position(x, y);
     }
 
+    /**
+     * display tile info on top-right
+     * @param tileType what type is the tile that mouse is pointing at
+     */
     public void displayTileInfo(TETile tileType) {
         clearRightFontArea();
         StdDraw.setFont(smallFont);
