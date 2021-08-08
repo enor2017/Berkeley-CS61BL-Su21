@@ -3,6 +3,12 @@ package byow.Core;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+
+import static byow.Core.IOUtils.*;
+
 /**
  * This class only handle game logics, all things about GUI are in GameWindow.java
  */
@@ -10,13 +16,16 @@ public class Engine {
     /* indicating whether game is end */
     private boolean isGameOver = false;
     /* The map that we're keeping */
-    TETile[][] map = null;
+    private TETile[][] map = null;
     /* GameWindow for handling GUI part */
-    GameWindow gameWindow = new GameWindow();
+    private GameWindow gameWindow = new GameWindow();
     /* Avatar's position */
-    Position avatar = null;
+    private Position avatar = null;
     /* Avatar's life left */
-    int life = 5;
+    private int life = 5;
+    /* Save & load map from this file */
+    private static final File CWD = new File(System.getProperty("user.dir"));
+    private static final File SAVE_FILE = join(CWD, "savefile.txt");
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -87,6 +96,10 @@ public class Engine {
         }
     }
 
+    /* =============================================== */
+    /* ===============  Input handlers =============== */
+    /* =============================================== */
+
     /**
      * handling all character inputs
      * @param input the input character
@@ -110,6 +123,20 @@ public class Engine {
                 if(inputSource.isDisplayable()) {
                     gameWindow.displayGameWindow(map, life);
                 }
+                break;
+            case 'l', 'L':
+                // load map
+                if(readMap()) {
+                    findAvatar();
+                    if(inputSource.isDisplayable()) {
+                        gameWindow.displayGameWindow(map, life);
+                    }
+                }
+                break;
+            case ':':
+                saveMap();
+                System.out.println("Successfully save map!");
+                isGameOver = true;
                 break;
             case 'w', 'W':
                 // move avatar, and check whether refresh display
@@ -156,6 +183,10 @@ public class Engine {
             }
         }
     }
+
+    /* ================================================== */
+    /* ===============  All Avatar stuff  =============== */
+    /* ================================================== */
 
     /**
      * find avatar's position in current map, store in this.avatar.
@@ -211,5 +242,32 @@ public class Engine {
         if(checkPositionInBound(newPos) && isFloor(newPos)) {
             setAvatarPos(newPos);
         }
+    }
+
+    /* ================================================== */
+    /* ===============  Save & Load Map  ================ */
+    /* ================================================== */
+
+    private void saveMap() {
+        // if savefile.txt does not exist, create a new one
+        if(!SAVE_FILE.exists()) {
+            try {
+                SAVE_FILE.createNewFile();
+            } catch (IOException e) {
+                System.out.println("Error while creating savefile.txt");
+            }
+        }
+        // write map into savefile
+        writeObject(SAVE_FILE, map);
+    }
+
+    private boolean readMap() {
+        // if savefile.txt does not exist, print error message
+        if(!SAVE_FILE.exists()) {
+            System.out.println("Map file does not exist.");
+            return false;
+        }
+        map = readObject(SAVE_FILE, map.getClass());
+        return true;
     }
 }
