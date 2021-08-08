@@ -15,6 +15,8 @@ public class Engine {
     GameWindow gameWindow = new GameWindow();
     /* Avatar's position */
     Position avatar = null;
+    /* Avatar's life left */
+    int life = 5;
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -72,10 +74,16 @@ public class Engine {
                 // get the map after handling the input
                 handleKeyboardInput(inputSource.getNextKey(), inputSource);
             }
-            // mouse position
-//            double mouseX = StdDraw.mouseX();
-//            double mouseY = StdDraw.mouseY();
-//            System.out.println("Mouse position: " + mouseX + ", " + mouseY);
+            // mouse position, detect if already has a map
+            if(map != null) {
+                Position mousePos = gameWindow.getMousePos();
+                // if mouse position out of bound, do nothing
+                if(checkPositionInBound(mousePos)) {
+                    gameWindow.displayTileInfo(map[mousePos.getX()][mousePos.getY()]);
+                } else {
+                    gameWindow.displayTileInfo(Tileset.NOTHING);
+                }
+            }
         }
     }
 
@@ -100,25 +108,25 @@ public class Engine {
                 findAvatar();
                 // after entering seed, display game window
                 if(inputSource.isDisplayable()) {
-                    gameWindow.displayGameWindow(map);
+                    gameWindow.displayGameWindow(map, life);
                 }
                 break;
             case 'w', 'W':
                 // move avatar, and check whether refresh display
                 moveAvatar(new Position(0, 1));
-                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map, life);
                 break;
             case 'a', 'A':
                 moveAvatar(new Position(-1, 0));
-                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map, life);
                 break;
             case 's', 'S':
                 moveAvatar(new Position(0, -1));
-                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map, life);
                 break;
             case 'd', 'D':
                 moveAvatar(new Position(1, 0));
-                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map);
+                if(inputSource.isDisplayable()) gameWindow.displayGameWindow(map, life);
                 break;
             default:
                 System.out.println("Unknown input!");
@@ -153,8 +161,8 @@ public class Engine {
      * find avatar's position in current map, store in this.avatar.
      */
     private void findAvatar() {
-        for(int i = 0; i < GameWindow.WIDTH; ++i) {
-            for(int j = 0; j < GameWindow.HEIGHT; ++j) {
+        for(int i = 0; i < GameWindow.MAP_WIDTH; ++i) {
+            for(int j = 0; j < GameWindow.MAP_HEIGHT; ++j) {
                 if(map[i][j] == Tileset.AVATAR) {
                     avatar = new Position(i, j);
                     return;
@@ -182,7 +190,7 @@ public class Engine {
     private boolean checkPositionInBound(Position pos) {
         int x = pos.getX();
         int y = pos.getY();
-        return (x >= 0 && x < GameWindow.WIDTH) && (y >= 0 && y < GameWindow.HEIGHT);
+        return (x >= 0 && x < GameWindow.MAP_WIDTH) && (y >= 0 && y < GameWindow.MAP_HEIGHT);
     }
 
     /**
