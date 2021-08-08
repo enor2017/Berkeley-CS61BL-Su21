@@ -2,19 +2,22 @@ package byow.Core;
 
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
+import java.io.Serializable;
 
 import static byow.Core.IOUtils.*;
 
 /**
  * This class only handle game logics, all things about GUI are in GameWindow.java
  */
-public class Engine {
+public class Engine implements Serializable {
     /* indicating whether game is end */
     private boolean isGameOver = false;
+    /* indicating whether game is saved so that game should end */
+    private boolean isGameSaved = false;
     /* The map that we're keeping */
     private TETile[][] map = null;
     /* GameWindow for handling GUI part */
@@ -73,7 +76,7 @@ public class Engine {
             gameWindow.displayMenu();
         }
 
-        while(!isGameOver) {
+        while(!isGameOver && !isGameSaved) {
             // For String inputSource, no next input means game over
             if(!inputSource.isDisplayable() && inputSource.possibleNextInput()) {
                 break;
@@ -94,6 +97,8 @@ public class Engine {
                 }
             }
         }
+        if(isGameSaved) gameWindow.showSaveSuccess();
+        else gameWindow.showGameEnd();
     }
 
     /* =============================================== */
@@ -131,12 +136,26 @@ public class Engine {
                     if(inputSource.isDisplayable()) {
                         gameWindow.displayGameWindow(map, life);
                     }
+                } else {
+                    System.out.println("Fail to read map.");
                 }
                 break;
             case ':':
+                // waiting for input Q
+                while(true) {
+                    if(inputSource.possibleNextInput()) {
+                        char c = inputSource.getNextKey();
+                        if(c == 'Q' || c == 'q') {
+                            break;
+                        }else {
+                            System.out.println("Invalid input!!");
+                            return;
+                        }
+                    }
+                }
                 saveMap();
                 System.out.println("Successfully save map!");
-                isGameOver = true;
+                isGameSaved = true;     // flag game as saved, so we ends the game
                 break;
             case 'w', 'W':
                 // move avatar, and check whether refresh display
@@ -194,7 +213,7 @@ public class Engine {
     private void findAvatar() {
         for(int i = 0; i < GameWindow.MAP_WIDTH; ++i) {
             for(int j = 0; j < GameWindow.MAP_HEIGHT; ++j) {
-                if(map[i][j] == Tileset.AVATAR) {
+                if(map[i][j].equals(Tileset.AVATAR)) {
                     avatar = new Position(i, j);
                     return;
                 }
@@ -230,7 +249,7 @@ public class Engine {
      * @return true if is floor, false else
      */
     private boolean isFloor(Position pos) {
-        return map[pos.getX()][pos.getY()] == Tileset.FLOOR;
+        return map[pos.getX()][pos.getY()].equals(Tileset.FLOOR);
     }
 
     /**
@@ -248,6 +267,9 @@ public class Engine {
     /* ===============  Save & Load Map  ================ */
     /* ================================================== */
 
+    /**
+     * save current map to savefile.txt, using serializable
+     */
     private void saveMap() {
         // if savefile.txt does not exist, create a new one
         if(!SAVE_FILE.exists()) {
@@ -261,13 +283,17 @@ public class Engine {
         writeObject(SAVE_FILE, map);
     }
 
+    /**
+     * load map from savefile.txt, using serializable
+     * @return true if successful, false if fail
+     */
     private boolean readMap() {
         // if savefile.txt does not exist, print error message
         if(!SAVE_FILE.exists()) {
             System.out.println("Map file does not exist.");
             return false;
         }
-        map = readObject(SAVE_FILE, map.getClass());
+        map = (TETile[][]) readObject(SAVE_FILE);
         return true;
     }
 }

@@ -91,6 +91,7 @@ public class GameWindow {
             ter.initialize(MAP_WIDTH, MAP_HEIGHT);
             changeSize = false;
         }
+        StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
 
         // display game maze
@@ -153,12 +154,32 @@ public class GameWindow {
         clearRightFontArea();
         StdDraw.setFont(smallFont);
         String message = "";
-        if(tileType == Tileset.NOTHING) message = "oops! It seems nothing here.";
-        else if(tileType == Tileset.FLOOR) message = "Here, you find a normal floor.";
-        else if(tileType == Tileset.AVATAR) message = "Hey! Here is where you are!";
-        else if(tileType == Tileset.WALL) message = "This is a wall, don't try to break it.";
+        if(tileType.equals(Tileset.NOTHING)) message = "oops! It seems nothing here.";
+        else if(tileType.equals(Tileset.FLOOR)) message = "Here, you find a normal floor.";
+        else if(tileType.equals(Tileset.AVATAR)) message = "Hey! Here is where you are!";
+        else if(tileType.equals(Tileset.WALL)) message = "This is a wall, don't try to break it.";
         else message = "What the hell are you pointing at???";
         StdDraw.textRight(WIDTH, HEIGHT - 1.5, message);
+        StdDraw.show();
+    }
+
+    /**
+     * show successfully save map screen.
+     */
+    public void showSaveSuccess() {
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setFont(bigFont);
+        StdDraw.text(WIDTH / 2.0, HEIGHT / 2.0, "Successfully saved map!");
+        StdDraw.show();
+    }
+
+    /**
+     * show game end screen.
+     */
+    public void showGameEnd() {
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setFont(bigFont);
+        StdDraw.text(WIDTH / 2.0, HEIGHT / 2.0, "The END.");
         StdDraw.show();
     }
 }

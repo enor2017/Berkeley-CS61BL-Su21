@@ -190,4 +190,13 @@ public class TETile implements Serializable {
 
         return copy;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj.getClass() != this.getClass()) {
+            return false;
+        }
+        TETile t = (TETile) obj;
+        return this.character == t.character;
+    }
 }
