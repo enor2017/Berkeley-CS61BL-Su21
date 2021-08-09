@@ -2,7 +2,6 @@ package byow.Core;
 
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
-import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class Engine implements Serializable {
 
         while(!isGameOver && !isGameSaved) {
             // For String inputSource, no next input means game over
-            if(!inputSource.isDisplayable() && inputSource.possibleNextInput()) {
+            if(!inputSource.isDisplayable() && !inputSource.possibleNextInput()) {
                 break;
             }
             // for each time, interact with keyboard and mouse
@@ -86,8 +85,8 @@ public class Engine implements Serializable {
                 // get the map after handling the input
                 handleKeyboardInput(inputSource.getNextKey(), inputSource);
             }
-            // mouse position, detect if already has a map
-            if(map != null) {
+            // mouse position, detect if already has a map and if is keyboard input
+            if(map != null && inputSource.isDisplayable()) {
                 Position mousePos = gameWindow.getMousePos();
                 // if mouse position out of bound, do nothing
                 if(checkPositionInBound(mousePos)) {
@@ -97,8 +96,11 @@ public class Engine implements Serializable {
                 }
             }
         }
-        if(isGameSaved) gameWindow.showSaveSuccess();
-        else gameWindow.showGameEnd();
+        // show gameEnd or gameSaved window
+        if(inputSource.isDisplayable()) {
+            if(isGameSaved) gameWindow.showSaveSuccess();
+            else gameWindow.showGameEnd();
+        }
     }
 
     /* =============================================== */

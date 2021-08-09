@@ -460,17 +460,17 @@ public class WorldGenerator {
      */
     public TETile[][] convertToTile() {
         growMaze(new Position(1, 1));
-        System.out.println("Maze successfully generated.");
+        // System.out.println("Maze successfully generated.");
         spareness(0);
-        System.out.println("Maze successfully spared.");
+        // System.out.println("Maze successfully spared.");
         placeRooms();
-        System.out.println("Room successfully generated.");
+        // System.out.println("Room successfully generated.");
         spareness(1);
-        System.out.println("Maze successfully spared AFTER generating room.");
+        // System.out.println("Maze successfully spared AFTER generating room.");
         removeUnnecessaryWalls();
-        System.out.println("Unnecessary Walls successfully removed.");
+        // System.out.println("Unnecessary Walls successfully removed.");
         placeAvatar();
-        System.out.println("Avatar successfully placed.");
+        // System.out.println("Avatar successfully placed.");
 
         TETile[][] tiles = new TETile[width][height];
         for(int i = 0; i < width; ++i) {
